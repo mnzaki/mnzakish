@@ -10,7 +10,11 @@ CONCENTRATION_MANTRA=(
   CONcenTRAtE
   ConcENTRATE
 )
-CONCENTRATION_CMD='cal'
+function concentration_grounds {
+  date
+  cal
+}
+
 CCCCount=0
 MAX_CCCs=50
 CCCCount_direction=1
@@ -23,7 +27,7 @@ function concentration {
     (( CCCCount = CCCCount + CCCCount_direction ))
     # and check
     if [ $CCCCount -ge $MAX_CCCs ]; then
-      AND_CONCENTRATION_CMD=$CONCENTRATION_CMD
+      AND_GROUNDS=1
       CCCCount_direction=-1
       (( CCCCount-- ))
     elif [ $CCCCount -le 0 ]; then
@@ -43,12 +47,15 @@ function concentration {
       echo ${CONCENTRATION_MANTRA[$CONC_IDX]}
       (( CONCENTRATE_TIMES++ ))
     done
-    $AND_CONCENTRATION_CMD
+    if [ "$AND_GROUNDS" != "" ]; then
+      concentration_grounds
+    fi
   else
     CCCCount=0
-    AND_CONCENTRATION_CMD=
+    AND_GROUNDS=
   fi
 }
+
 case "$PROMPT_COMMAND" in
   *concentration*)
     # Do stuff #
