@@ -1,5 +1,5 @@
 # mnzakish
-`mnzakish`, or `msh` for short, is really just `bash` and some stuff over each other. _msh_ is pronounced مِشّْ
+`mnzakish`, or `msh` for short, is really just `bash` and some stuff over each other. _msh_ is pronounced like the Arabic "مِشّْ " or the German "mich", not like the English "mesh".
 
 ## Context / Stack Frame
 
