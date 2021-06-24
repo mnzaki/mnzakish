@@ -12,3 +12,10 @@ An _SF_ is a unit of attention attributable to an _Intent_. _msh_ is an intent m
 
 
 
+## concentration.sh
+
+Do not try to directly invoke concentration.sh, rather source it in your shell
+(or .bashrc):
+```
+source ~/.msh/concentration.sh
+```

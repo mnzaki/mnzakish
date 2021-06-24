@@ -1,3 +1,33 @@
+#!/bin/bash
+#===============================================================================
+#
+#          FILE: concentration.sh
+#
+#         USAGE: source ./concentration.sh
+#
+#   DESCRIPTION:
+#
+#       OPTIONS: ---
+#  REQUIREMENTS: ---
+#          BUGS: ---
+#         NOTES: ---
+#        AUTHOR: YOUR NAME (),
+#  ORGANIZATION:
+#       CREATED: 24.06.2021 23:13:05
+#      REVISION:  ---
+#===============================================================================
+
+if [ "$0" = "$BASH_SOURCE" ]; then
+  echo "You are trying to directly invoke concentration."
+  echo "Concentration must be sourced."
+  exit 1
+fi
+
+#set -o nounset                                  # Treat unset variables as an error
+
+BASE="$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" &> /dev/null && pwd )"
+source "$BASE/intention.sh"
+
 CONCENTRATION_MANTRA=(
   conCENTRATE
   ConcENTRATE
@@ -9,6 +39,7 @@ CONCENTRATION_MANTRA=(
   CONCEntrATE
   CONcenTRAtE
   ConcENTRATE
+  conCENTRATE
 )
 
 function concentration_grounds {
@@ -46,18 +77,22 @@ function concentration {
     else
       (( CONC_IDX_OFFSET = (CONC_IDX_OFFSET+1) % NUM_MANTRAS ))
     fi
-    paste -d ' ' <(
-      echo concentrate
-      while [ $CONCENTRATION_TIMES -lt $CCCCount ]; do
-        local CONC_IDX=$(( (CONCENTRATION_TIMES+CONC_IDX_OFFSET) % NUM_MANTRAS))
-        echo ${CONCENTRATION_MANTRA[$CONC_IDX]}
-        (( CONCENTRATION_TIMES++ ))
-      done
-    ) <(echo -e "$DIVERSION_NOTES\n" | head -n $CCCCount)
-    if [ "$AND_GROUNDS" != "" ]; then
-      concentration_grounds
+
+    if [ $CONCENTRATION_TIMES -lt $CCCCount ]; then
+      ((CONCENTRATION_TIMES++))
+      paste -d ' ' <(
+        echo concentrate
+        while [ $CONCENTRATION_TIMES -lt $CCCCount ]; do
+          local CONC_IDX=$(( (CONCENTRATION_TIMES+CONC_IDX_OFFSET) % NUM_MANTRAS))
+          echo ${CONCENTRATION_MANTRA[$CONC_IDX]}
+          (( CONCENTRATION_TIMES++ ))
+        done
+      ) <(getintentions | head -n $((CCCCount-1)) )
+      if [ "$AND_GROUNDS" != "" ]; then
+        concentration_grounds
+      fi
+      ((CONC_IDX_OFFSET++))
     fi
-    ((CONC_IDX_OFFSET++))
   else
     CCCCount=0
     AND_GROUNDS=
