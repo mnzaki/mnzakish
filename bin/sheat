@@ -1,0 +1,13 @@
+#!/bin/bash
+A="AAAA"
+B="BB"
+ARR=("$A" "$B")
+
+paste <(cat $BASH_SOURCE) <( # print these two files side by side
+printf '\n%.0s' {1..7}  # for every argument print a new line and a 0 len substr
+echo ${A/A/C}     ##    replace first "A" with "C"        #    CAAA
+echo ${A//A/C}    ##    replace every "A" with "C"        #    CCCC
+echo ${#A}        ##    length of $A                      #    4
+echo ${#ARR}      ##    length of first element of $ARR   #    4
+echo ${#ARR[@]}   ##    length of $ARR                    #    2
+)
