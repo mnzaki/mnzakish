@@ -42,6 +42,20 @@ CONCENTRATION_MANTRA=(
   conCENTRATE
 )
 
+CONCENTRATION_MANTRA=(
+  kkkKAAASSSS
+  SssseEEEFFF
+  KKkkaaaASSS
+  SSSseeffFFF
+  CONCEntratE
+  CONCENTrate
+  CONCENtratE
+  CONCEntrATE
+  CONcentRATE
+  KKkkaaaASSS
+  SssseEEEFFF
+)
+
 function concentration_grounds {
   #echo -e "-----------\n$DIVERSION_NOTES\n-----------"
   date
