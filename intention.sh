@@ -24,46 +24,46 @@ if [ "$0" = "$BASH_SOURCE" ]; then
 fi
 
 #set -o nounset                                  # Treat unset variables as an error
-BASE="$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" &> /dev/null && pwd )"
+MSHBASE="$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" &> /dev/null && pwd )"
 
-PRE_INTENTION="${PRE_INTENTION:-}"
-INTENTION="${INTENTION:-}"
-INTENTION_STACK="${INTENTION_STACK:-}"
+STACK_CHAR="${STACK_CHAR:-|}"
+INTENTIONS=("${INTENTIONS[@]}")
+INTENTIONS_DONE=("${INTENTIONS_DONE[@]}")
 
-#mkdir -p $BASE/intentions
-#FILE_INTENTION=$(date -Ihours)
-#if [ -e "$FILE_INTENTION" ]; then
-#  INTENTION="$(cat "$FILE_INTENTION")"
-#fi
-#
+PS1="${PS1/'$(printdirstack)'/}"
+export PS1='$(printdirstack)'"$PS1"
 
-function setintention {
-#  echo "$INTENTION" >> "$FILE_INTENTION"
-  INTENTION="$(readintention "$@")"
-  export INTENTION
-  env - INTENTION="$INTENTION" &> /dev/null
+function printdirstack {
+  local STACK=(`dirs -p`)
+  local STACK="${STACK[@]/*/$STACK_CHAR}"
+  echo -n ${STACK// /}
 }
 
-function intend {
-  setintention $@
+function readintention {
+  echo "${@:-$(cat -)}"
+}
+
+function setintention {
+  local INTENTION="$(readintention "$@")"
+  local STACK=(`dirs -p`)
+  local PRE_INTENTION="${INTENTIONS[ (( ${#STACK[@]} - 1 )) ]}"
+  INTENTIONS[(( ${#STACK[@]} - 1 ))]="$PRE_INTENTION\n$INTENTION"
 }
 
 function si {
-  setintention $@
-}
-
-function appendintention {
-  PRE_INTENTION="$INTENTION"
   setintention "$@"
-  setintention "$PRE_INTENTION\n$INTENTION"
-}
-
-function ai {
-  appendintention $@
 }
 
 function getintentions {
-  echo -e "$PRE_INTENTION$INTENTION"
+  local STACK=(`dirs -p`)
+  local STACKN=${#STACK[@]}
+  for (( idx=0; idx<$STACKN; idx++ )); do
+    echo -n ${STACK[(($idx))]}
+    echo -e "${INTENTIONS[$STACKN - idx - 1]}\n"
+  done
+
+  echo "previously:"
+  echo -e "\n${INTENTIONS_DONE[@]}"
 }
 
 function gist {
@@ -75,29 +75,22 @@ function gi {
 }
 
 function diverge {
-  "$BASE/diversion.sh" "$@"
+  pushd $1
+  setintention
 }
 
 function di {
-  diverge "$@"
+  diverge "${@:-.}"
 }
 
-function setpreintention {
-  PRE_INTENTION="$@\n\n=====================\n\n"
+function diversiondone {
+  local STACK=(`dirs -p`)
+  local IDX=$((${#STACK[@]} - 1))
+  INTENTIONS_DONE+=("${STACK[$IDX]}${INTENTIONS[$IDX]}")
+  INTENTIONS[$IDX]=''
+  popd
 }
 
-function incintentionstack {
-  INTENTION_STACK="|$1"
-  PS1="$INTENTION_STACK$PS1"
-}
-
-function readintention {
-  echo "${@:-$(cat -)}"
-}
-
-function prepare_next_intention {
-  echo 'source "'"$BASE/intention.sh"'"'
-  echo 'setpreintention "'"$INTENTION"'"'
-  echo 'incintentionstack "'"$INTENTION_STACK"'"'
-  echo 'setintention "'"$@"'"'
+function dn {
+  diversiondone
 }
