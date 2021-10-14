@@ -23,12 +23,11 @@ source "$_msh_base/lib/fndispatch.sh"
 # Focus an x11 window owned by a process with the given command line
 # or execute the command line if no such window
 focus_or_exec() {
-  local cmd="$@"
-  if [ "$cmd" = "" ]; then
+  if [ "$1" = "" ]; then
     return 1
   fi
-  if ! focus_window_cmd "$cmd"; then
-    fndispatch_exec "$cmd"
+  if ! focus_window_cmd "$@"; then
+    $@
   fi
 }
 
