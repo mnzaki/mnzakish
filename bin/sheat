@@ -1,13 +1,23 @@
 #!/bin/bash
-A="AAAA"
-B="BB"
+A="aaaa"
+B="cd"
 ARR=("$A" "$B")
-
-paste <(cat $BASH_SOURCE) <( # print these two files side by side
-printf '\n%.0s' {1..7}  # for every argument print a new line and a 0 len substr
-echo ${A/A/C}     ##    replace first "A" with "C"        #    CAAA
-echo ${A//A/C}    ##    replace every "A" with "C"        #    CCCC
-echo ${#A}        ##    length of $A                      #    4
-echo ${#ARR}      ##    length of first element of $ARR   #    4
-echo ${#ARR[@]}   ##    length of $ARR                    #    2
+# `paste` prints files side by side
+paste $BASH_SOURCE <(
+  printf '\n%.0s' {1..7} # for every argument print a new line and a 0 len substr
+  echo {1..7}       ##   sequence from 1 to 7               #
+  echo {C..G}       ##   sequence from C to G               #
+  echo ${A/a/c}     ##   replace $A's first "a" with "c"    #
+  echo ${A//a/c}    ##   replace $A's every "a" with "c"    #
+  echo ${#A}        ##   length of $A                       #
+  echo ${#ARR}      ##   length of first element of $ARR    #
+  echo ${#ARR[@]}   ##   length of $ARR                     #
+  echo ${A%aa}      ##   remove aa suffix from $A           #
+  echo ${B#c}       ##   remove c prefix from $B            #
+  $B                ##   evaluate $B, so cd (~ by default)  #
+  pwd; pwd          ##   where are we? print working dir    #
+  echo $((2+2))     ##   do some math                       #
+  echo $RANDOM      ##   a random variable                  #
+  echo {0..$((RANDOM/327))}                                 #
+  eval echo {0..$((RANDOM/3276))}                           #
 )
