@@ -11,7 +11,7 @@
 #  REQUIREMENTS: ---
 #          BUGS: ---
 #         NOTES: ---
-#        AUTHOR: YOUR NAME (),
+#        AUTHOR: Mina Nagy Zaki <mnzaki@gmail.com>
 #  ORGANIZATION:
 #       CREATED: 24.06.2021 23:13:05
 #      REVISION:  ---
@@ -34,20 +34,20 @@ PS1="${PS1/'$(printdirstack)'/}"
 export PS1='$(printdirstack)'"$PS1"
 
 function printdirstack {
-  local STACK=(`dirs -p`)
-  local STACK="${STACK[@]/*/$STACK_CHAR}"
-  echo -n ${STACK// /}
+  local NSTACK=$(dirs -p | wc -l)
+  printf "%0.s$STACK_CHAR" $(eval echo {1..$NSTACK})
 }
 
 function readintention {
-  echo "${@:-$(cat -)}"
+  local INTENTION="${@:-$(cat -)}"
+  echo `date -Imin` "$INTENTION"
 }
 
 function setintention {
   local INTENTION="$(readintention "$@")"
-  local STACK=(`dirs -p`)
-  local PRE_INTENTION="${INTENTIONS[ (( ${#STACK[@]} - 1 )) ]}"
-  INTENTIONS[(( ${#STACK[@]} - 1 ))]="$PRE_INTENTION\n$INTENTION"
+  local NSTACK=$(dirs -p | wc -l)
+  local PRE_INTENTION="${INTENTIONS[ (( $NSTACK - 1 )) ]}"
+  INTENTIONS[(( $NSTACK - 1 ))]="$PRE_INTENTION\n$INTENTION"
 }
 
 function si {
@@ -55,7 +55,8 @@ function si {
 }
 
 function getintentions {
-  local STACK=(`dirs -p`)
+  declare -a STACK
+  readarray -t STACK <<<"$(dirs -p)"
   local STACKN=${#STACK[@]}
   for (( idx=0; idx<$STACKN; idx++ )); do
     echo -n ${STACK[(($idx))]}
@@ -63,7 +64,9 @@ function getintentions {
   done
 
   echo "previously:"
-  echo -e "\n${INTENTIONS_DONE[@]}"
+  for (( idx=0; idx<${#INTENTIONS_DONE[@]}; idx++ )); do
+    echo -e "${INTENTIONS_DONE[$idx]}\n"
+  done
 }
 
 function gist {
@@ -75,7 +78,7 @@ function gi {
 }
 
 function diverge {
-  pushd $1
+  pushd "$1"
   setintention
 }
 
@@ -84,7 +87,8 @@ function di {
 }
 
 function diversiondone {
-  local STACK=(`dirs -p`)
+  declare -a STACK
+  readarray -t STACK <<<"$(dirs -p)"
   local IDX=$((${#STACK[@]} - 1))
   INTENTIONS_DONE+=("${STACK[$IDX]}${INTENTIONS[$IDX]}")
   INTENTIONS[$IDX]=''
