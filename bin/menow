@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# extended globbing for TIMESTAMP matching support
+shopt -s extglob
+ME=~/pkb/me
+
+# NOTE: if format is changed remember to change
+#       the POSSIBLY_FILE trimming below
+TIMESTAMP=`date +%m%d-%H%M`
+FILE_EXT=".md"
+TITLE="$@"
+
+# If the first argument is a pre-existing file
+POSSIBLY_FILE="$(realpath --relative-to . "$1")"
+if [[ -f "$POSSIBLY_FILE" ]]; then
+  # we use that file as the title
+  TITLE="$(basename "$POSSIBLY_FILE")"
+  # trim a prepended TIMESTAMP if there is any
+  TITLE="${TITLE#*+([0-9])-+([0-9])_}"
+  POSSIBLY_FILE="previously: $POSSIBLY_FILE"
+else
+  POSSIBLY_FILE=""
+fi
+
+if [[ "$TITLE" != "" ]]; then
+  TITLE="_$TITLE"
+fi
+FULL_FILE_NAME="${TIMESTAMP}${TITLE//[ ]/_}$FILE_EXT"
+
+# Check that `now` exists
+cd $ME
+NOW=$(date +%Y)
+if ! ls -l now | grep -q $NOW; then
+  # and link it if it doesn't
+  ln -sr $NOW now
+fi
+MENOW="$ME/now"
+
+case `basename "$0"` in
+  menow)
+    cd $MENOW
+    ;;
+  todayi)
+    cd $MENOW
+    FULL_FILE_NAME="`date +%m%d`_today_I$FILE_EXT"
+    set -x
+    echo "## [" `date +%T` "]" >> "$FULL_FILE_NAME"
+    if [ "$1" != "" ]; then
+      echo "- $@" >> "$FULL_FILE_NAME"
+      exit 0
+    else
+      exec vim "$FULL_FILE_NAME"
+    fi
+    ;;
+  herenow)
+    ;;
+esac
+
+set -x
+# we echo this at the top of the file, as a reference to the previous file
+echo "$POSSIBLY_FILE" >> "$FULL_FILE_NAME"
+exec vim "$FULL_FILE_NAME"
