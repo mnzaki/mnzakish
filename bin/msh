@@ -1,0 +1,33 @@
+#!/bin/bash -
+#===============================================================================
+#
+#          FILE: m.sh
+#
+#         USAGE: ./m.sh
+#
+#   DESCRIPTION: 
+#
+#       OPTIONS: ---
+#  REQUIREMENTS: ---
+#          BUGS: ---
+#         NOTES: ---
+#        AUTHOR: Mina Nagy Zaki (mnzaki), mnzaki@gmail.com
+#  ORGANIZATION: mnzaki.com
+#       CREATED: 08.07.2022 17:18:45
+#      REVISION:  ---
+#===============================================================================
+
+#set -o nounset                                  # Treat unset variables as an error
+
+MSH_BASE="$( cd "$( dirname "$(realpath "${BASH_SOURCE[0]}")")/.." >/dev/null && pwd )"
+# TODO make it so it can be installed elsewhere
+source "$MSH_BASE/lib/init.sh"
+
+case "$1" in
+  dir) echo $MSH_DIR;;
+  bashrc)
+    echo source $MSH_DIR/bashrc
+  ;;
+  lib) echo $MSH_DIR/lib/$2.sh;;
+  conf) echo $HOME_MSH/conf.sh;;
+esac

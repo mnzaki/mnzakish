@@ -3,7 +3,7 @@
 #
 #          FILE: x11.sh
 #
-#         USAGE: ./x11.sh
+#         USAGE: source ~/.msh/lib/x11.sh
 #
 #   DESCRIPTION: X11 helpers / utilities
 #
@@ -22,7 +22,7 @@ source "$_msh_base/lib/fndispatch.sh"
 
 # Focus an x11 window owned by a process with the given command line
 # or execute the command line if no such window
-focus_or_exec() {
+function msh_focus_or_exec() {
   if [ "$1" = "" ]; then
     return 1
   fi
@@ -32,7 +32,7 @@ focus_or_exec() {
 }
 
 # Focus an x11 window owned by a process with the given command line
-focus_window_cmd() {
+function msh_focus_window_cmd() {
   local cmd="$@"
   if [ "$cmd" = "" ]; then
     return 1
@@ -49,7 +49,7 @@ focus_window_cmd() {
 }
 
 # Focus x11 windows owned by a process with the given PIDs
-focus_window_pids() {
+function msh_focus_window_pids() {
   if [ "$@" = "" ]; then
     return 1
   fi

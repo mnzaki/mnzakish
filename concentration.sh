@@ -113,6 +113,7 @@ function concentration {
   fi
 }
 
+PROMPT_COMMAND=${PROMPT_COMMAND:-}
 case "$PROMPT_COMMAND" in
   *concentration*)
     # Do stuff #

@@ -53,20 +53,20 @@ PKB_HASHES_PATHS_BASE="$PKB_META_BASE/paths"
 # Using inodes
 # inodes change a lot because editors (vim) remove and add files
 # _msh_get_file_key () {
-#   stat --printf %i -L "$1"
+#   stat --printf %i -L "${1-}"
 # }
 
 # Using realpath without forward slashes
 # can cause conflicts, and unreliable because of moves
 # _msh_get_file_key () {
-#   local p="$(realpath "$1")"
+#   local p="$(realpath "${1-}")"
 #   echo "${p//\//}"
 # }
 
 
 _msh_get_file_key() {
-  local full_path="$(realpath "$1")"
-  local p="$PKB_HASHES_BASE$1/_hash"
+  local full_path="$(realpath "${1-}")"
+  local p="$PKB_HASHES_BASE${1-}/_hash"
   local hash_val
   if [ -e "$p" ]; then
     hash_val=$(cat "$p")
@@ -81,11 +81,11 @@ _msh_get_file_key() {
 }
 
 _msh_get_file_key_paths_file() {
-  echo -n "$PKB_HASHES_PATHS_BASE/$1"
+  echo -n "$PKB_HASHES_PATHS_BASE/${1-}"
 }
 
 _msh_get_file_key_paths() {
-  local paths_file="$(_msh_get_file_key_paths_file "$1")"
+  local paths_file="$(_msh_get_file_key_paths_file "${1-}")"
   cat $paths_file 2>/dev/null
 }
 
@@ -93,7 +93,7 @@ _msh_compute_file_key() {
   local hash_val
   case "$HASH_FN" in
     sha256)
-      local hash_out=($(sha256sum "$1"))
+      local hash_out=($(sha256sum "${1-}"))
       hash_val=${hash_out[0]}
       ;;
   esac
@@ -102,7 +102,7 @@ _msh_compute_file_key() {
 }
 
 _msh_ensure_file_key_uptodate () {
-  local f_key="$1" f_path="$2"
+  local f_key="${1-}" f_path="${2-}"
   # TODO
   # - if hash has tags, it should rehash the file to ensure freshness of hash
   # - and fix up the caches if needed
@@ -110,7 +110,7 @@ _msh_ensure_file_key_uptodate () {
 
 
 _msh_ensure_file_key_paths_uptodate () {
-  local f_key="$1" f_path="$2"
+  local f_key="${1-}" f_path="${2-}"
   local f_paths_file="$(_msh_get_file_key_paths_file $f_key)"
   if [ ! -e "$f_paths_file" ]; then
     touch "$f_paths_file"
@@ -230,10 +230,10 @@ tagls () {
       if [ ${#ts} -eq 0 ]; then
         continue
       fi
-      echo -n "$1 "
+      echo -n "${1-} "
       for t in "${ts[@]}"; do
         echo -n "${t%%/$f_key} "
-        #echo ${t%%"/$1"}
+        #echo ${t%%"/${1-}"}
       done
       echo
     done
@@ -242,7 +242,7 @@ tagls () {
 
 # $ tag FILE tag1 tag2 tag3
 function tag {
-  local FILE_NAME="$(realpath "$1")"
+  local FILE_NAME="$(realpath "${1-}")"
   shift
   local FILE_KEY=$(_msh_get_file_key "$FILE_NAME")
 
@@ -257,7 +257,7 @@ function tag {
 }
 
 function tagrm {
-  local FILE_NAME="$(realpath "$1")"
+  local FILE_NAME="$(realpath "${1-}")"
   shift
   local FILE_KEY=$(_msh_get_file_key "$FILE_NAME")
 
@@ -356,7 +356,7 @@ function _msh_tag_completion {
     1) COMPREPLY=($(compgen -f -d -- "$cur"))
       ;;
     *)
-      _msh_comp_tag "$1" "$2" "$3"
+      _msh_comp_tag "${1-}" "${2-}" "${3-}"
       ;;
   esac
 }
@@ -367,7 +367,7 @@ function _msh_tag_rm_completion {
     1) COMPREPLY=($(compgen -f -d -- "$cur"))
       ;;
     *)
-      _comp_file_tag "$1" "$2" "$3"
+      _comp_file_tag "${1-}" "${2-}" "${3-}"
       ;;
   esac
 }
@@ -376,6 +376,6 @@ complete -F _msh_tag_completion tag
 complete -F _msh_tag_rm_completion tagged
 complete -F _msh_comp_tag tagged
 
-if [ "$1" != "" ]; then
+if [ ! "${1-}" ]; then
   $@
 fi

@@ -24,7 +24,6 @@ if [ "$0" = "$BASH_SOURCE" ]; then
 fi
 
 #set -o nounset                                  # Treat unset variables as an error
-MSHBASE="$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" &> /dev/null && pwd )"
 
 STACK_CHAR="${STACK_CHAR:-|}"
 INTENTIONS=("${INTENTIONS[@]}")
