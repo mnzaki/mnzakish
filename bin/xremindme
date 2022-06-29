@@ -1,0 +1,28 @@
+#!/bin/bash -
+#===============================================================================
+#
+#          FILE: xremindme.sh
+#
+#         USAGE: ./xremindme.sh
+#
+#   DESCRIPTION: 
+#
+#       OPTIONS: ---
+#  REQUIREMENTS: ---
+#          BUGS: ---
+#         NOTES: ---
+#        AUTHOR: Mina Nagy Zaki <mnzaki@gmail.com>
+#  ORGANIZATION: 
+#       CREATED: 07.10.2021 21:43:30
+#      REVISION:  ---
+#===============================================================================
+
+set -o nounset                                  # Treat unset variables as an error
+set -e                                          # exit on non-zero exit status
+
+TIMEOUT=${1:-1m}
+NOW=`date +%d%m%y-%H%M%S` 
+echo $NOW
+sleep $1
+shift
+xmessage -default okay $NOW "$@"
