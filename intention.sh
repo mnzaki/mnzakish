@@ -29,8 +29,9 @@ STACK_CHAR="${STACK_CHAR:-|}"
 INTENTIONS=("${INTENTIONS[@]}")
 INTENTIONS_DONE=("${INTENTIONS_DONE[@]}")
 
-PS1="${PS1/'$(printdirstack)'/}"
-export PS1='$(printdirstack)'"$PS1"
+PS1_ADDITION='\[[38;5;7m\]\[[38;1;7m\]$(printdirstack)'
+PS1="${PS1/"$PS1_ADDITION"/}"
+export PS1="$PS1_ADDITION""$PS1"
 
 function printdirstack {
   local NSTACK=$(dirs -p | wc -l)

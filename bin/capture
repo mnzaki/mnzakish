@@ -1,0 +1,83 @@
+#!/bin/bash -
+#===============================================================================
+#
+#          FILE: capture.sh
+#
+#         USAGE: ./capture.sh
+#
+#   DESCRIPTION:
+#
+#       OPTIONS: ---
+#  REQUIREMENTS: ---
+#          BUGS: ---
+#         NOTES: ---
+#        AUTHOR: Mina Nagy Zaki (mnzaki), mnzaki@gmail.com
+#  ORGANIZATION: mnzaki.com
+#       CREATED: 09.08.2022 16:28:33
+#      REVISION:  ---
+#===============================================================================
+
+set -o nounset                                  # Treat unset variables as an error
+
+VIDEOS_DIR="$HOME/Videos"
+MUSIC_DIR="$HOME/Musik/now"
+CAP_URLS_FILE="$HOME/pkb/captured/urls"
+CAP_DATA_DIR="$HOME/pkb/captured/data"
+AS_MUSIC=${AS_MUSIC:-}
+
+T=${1:-}
+ESTATUS=
+TIMESTAMP=`date +%m%d-%H%M`
+CAPTURED=
+
+if [ -z "$T" ]; then
+  echo -e "Usage:\n$0 <TARGET>"
+  exit 1
+fi
+
+if [ ! -f "$CAP_URLS_FILE" ]; then
+  mkdir -p "$(dirname "$CAP_URLS_FILE")"
+  touch "$CAP_URLS_FILE"
+fi
+if [ ! -d "$CAP_DATA_DIR" ]; then
+  mkdir -p "$CAP_DATA_DIR"
+fi
+
+if isytdl "$T"; then
+
+  if [ -z "$AS_MUSIC" ]; then
+    pushd "$VIDEOS_DIR"
+    youtube-dl "$T" || youtube-dl -f best "$T"
+    ESTATUS=$?
+  else
+    pushd "$MUSIC_DIR"
+    youtube-dl-music "$T"
+    ESTATUS=$?
+  fi
+
+  if [ $ESTATUS -eq 0 ]; then
+    CAPTURED="$(realpath "$(ls -1tc | head -n1)")"
+    xsel -b <<< "$CAPTURED"
+    mp --fs "$CAPTURED" &
+  else
+    echo Failed for "$T"
+    exit $ESTATUS
+  fi
+  popd
+
+else # not a youtube-dl url
+  read CAP_NAME
+  CAPTURED="$CAP_DATA_DIR/$TIMESTAMP"
+  mkdir -p "$CAPTURED"
+  CAPTURED="$CAPTURED/$CAP_NAME"
+  monolith "$T" -o "$CAPTURED"
+  ESTATUS=$?
+fi
+
+if [ ! -z "$CAPTURED" ]; then
+  echo "$TIMESTAMP"/"$CAPTURED" "$T" >> "$CAP_URLS_FILE"
+fi
+
+# I want to know the original url of a file easily
+# I want to search through URLs I have saved
+# I want to search through titles and descriptions

@@ -1,4 +1,4 @@
 #!/bin/sh
 
 TARGETS="${@:-.}"
-find $TARGETS -type f -printf "%A@\t%a\t%p\n" | sort -n | awk -F"\t" '{print $2"\t"$3}'
+find $TARGETS -type f -printf "%A@\t%a\t%p\n" | sort -n | awk -F"\t" '{print $3"\t"$2}'
