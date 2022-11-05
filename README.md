@@ -1,8 +1,8 @@
 # current messsh
 To "install":
 1. clone the repo somewhere
-2. link `bin/msh` somewhere in your path.
-3. add `$(msh bashrc)` to your bashrc
+3. Run `./mnzakish/bin/msh`
+  a. it will add `msh bashrc` to your bashrc and expand your `$PATH`
 
 # mnzakish
 `mnzakish`, or `msh` for short, is a framework of shell tools to manage and

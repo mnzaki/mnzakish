@@ -5,7 +5,7 @@
 #
 #         USAGE: ./m.sh
 #
-#   DESCRIPTION: 
+#   DESCRIPTION:
 #
 #       OPTIONS: ---
 #  REQUIREMENTS: ---
@@ -22,6 +22,7 @@
 MSH_BASE="$( cd "$( dirname "$(realpath "${BASH_SOURCE[0]}")")/.." >/dev/null && pwd )"
 # TODO make it so it can be installed elsewhere
 source "$MSH_BASE/lib/init.sh"
+export MSH_DIR="$MSH_BASE"
 
 case "$1" in
   dir) echo $MSH_DIR;;
@@ -30,4 +31,8 @@ case "$1" in
   ;;
   lib) echo $MSH_DIR/lib/$2.sh;;
   conf) echo $HOME_MSH/conf.sh;;
+  *)
+    if ! grep -q "$MSH_BASE" "$HOME/.bashrc"; then
+      echo -e 'export PATH="'"$MSH_BASE/bin"':$PATH"\n$(msh bashrc)' >> "$HOME/.bashrc"
+    fi
 esac
