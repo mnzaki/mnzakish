@@ -1,4 +1,5 @@
 source /usr/share/mnzakish/lib/init.sh
+source /usr/share/mnzakish/lib/color.sh
 source "$MSH_DIR/concentration.sh"
 source "$MSH_DIR/intention.sh"
 source "$MSH_DIR/navigation.sh"
