@@ -1,3 +1,5 @@
+MSH_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+
 source "$MSH_DIR/lib/init.sh"
 source "$MSH_DIR/lib/color.sh"
 source "$MSH_DIR/concentration.sh"
