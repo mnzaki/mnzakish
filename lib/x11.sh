@@ -26,7 +26,7 @@ function msh_focus_or_exec() {
   if [ "$1" = "" ]; then
     return 1
   fi
-  if ! focus_window_cmd "$@"; then
+  if ! msh_focus_window_cmd "$@"; then
     $@
   fi
 }
@@ -43,7 +43,7 @@ function msh_focus_window_cmd() {
   if [ "$pids" = "" ]; then
     return 1
   else
-    focus_window_pids $pids
+    msh_focus_window_pids $pids
     return 0
   fi
 }

@@ -5,7 +5,7 @@
 #
 #         USAGE: ./pkb.sh
 #
-#   DESCRIPTION: 
+#   DESCRIPTION:
 #
 #       OPTIONS: ---
 #  REQUIREMENTS: ---
@@ -17,6 +17,6 @@
 #      REVISION:  ---
 #===============================================================================
 
-#set -o nounset                                  # Treat unset variables as an error
-
-PKB=${PKB:-~/pkb}
+PKB="${PKB:-$HOME/pkb}"
+VIDEOS_DIR="$HOME/Videos"
+MUSIC_DIR="$HOME/Musik/now"
