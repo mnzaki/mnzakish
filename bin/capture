@@ -8,7 +8,7 @@
 #   DESCRIPTION:
 #
 #       OPTIONS: ---
-#  REQUIREMENTS: ---
+#  REQUIREMENTS: mnzakish python-youtube-dl
 #          BUGS: ---
 #         NOTES: ---
 #        AUTHOR: Mina Nagy Zaki (mnzaki), mnzaki@gmail.com
@@ -19,28 +19,32 @@
 
 set -o nounset                                  # Treat unset variables as an error
 
-VIDEOS_DIR="$HOME/Videos"
-MUSIC_DIR="$HOME/Musik/now"
-CAP_URLS_FILE="$HOME/pkb/captured/urls"
-CAP_DATA_DIR="$HOME/pkb/captured/data"
-AS_MUSIC=${AS_MUSIC:-}
+`msh src lib/pkb`
+`msh src lib/x11`
 
-T=${1:-}
-ESTATUS=
-TIMESTAMP=`date +%m%d-%H%M`
-CAPTURED=
+CAP_URLS_FILE="$PKB/captured/urls"
+CAP_DATA_DIR="$PKB/captured/data"
+CAP_SCRATCH_FILE="$PKB/CAPTURE.md"
 
-if [ -z "$T" ]; then
-  echo -e "Usage:\n$0 <TARGET>"
-  exit 1
-fi
-
+# ensure directories exist
 if [ ! -f "$CAP_URLS_FILE" ]; then
   mkdir -p "$(dirname "$CAP_URLS_FILE")"
   touch "$CAP_URLS_FILE"
 fi
 if [ ! -d "$CAP_DATA_DIR" ]; then
   mkdir -p "$CAP_DATA_DIR"
+fi
+
+T=${1:-}
+AS_MUSIC=${AS_MUSIC:-}
+ESTATUS=
+TIMESTAMP=`date +%m%d-%H%M`
+CAPTURED=
+
+# if run without a target, open the scratchpad
+if [ -z "$T" ]; then
+  msh_focus_or_exec $VISUAL $CAP_SCRATCH_FILE
+  exit 0
 fi
 
 if isytdl "$T"; then
