@@ -50,7 +50,7 @@ case `basename "$0"` in
       echo "- $@" >> "$FULL_FILE_NAME"
       exit 0
     else
-      exec vim "$FULL_FILE_NAME"
+      exec $EDITOR "$FULL_FILE_NAME"
     fi
     ;;
   herenow)
@@ -60,4 +60,4 @@ esac
 set -x
 # we echo this at the top of the file, as a reference to the previous file
 echo "$POSSIBLY_FILE" >> "$FULL_FILE_NAME"
-exec vim "$FULL_FILE_NAME"
+exec $EDITOR "$FULL_FILE_NAME"
