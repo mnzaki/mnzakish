@@ -17,15 +17,23 @@ if [[ -f "$POSSIBLY_FILE" ]]; then
   TITLE="$(basename "$POSSIBLY_FILE")"
   # trim a prepended TIMESTAMP if there is any
   TITLE="${TITLE#*+([0-9])-+([0-9])_}"
-  POSSIBLY_FILE="previously: $POSSIBLY_FILE"
+  POSSIBLY_FILE="previously: file://./$POSSIBLY_FILE"
 else
   POSSIBLY_FILE=""
 fi
 
+TITLE=${TITLE//[ ]/_}
 if [[ "$TITLE" != "" ]]; then
   TITLE="_$TITLE"
+  PREVIOUS_MENOW=($ME/**/*${TITLE}${FILE_EXT})
 fi
-FULL_FILE_NAME="${TIMESTAMP}${TITLE//[ ]/_}$FILE_EXT"
+
+if [ -f "$PREVIOUS_MENOW" ]; then
+  echo "## [" `date +%T` "]" >> "$PREVIOUS_MENOW"
+  exec $EDITOR "$PREVIOUS_MENOW"
+fi
+
+FULL_FILE_NAME="${TIMESTAMP}$TITLE$FILE_EXT"
 
 # Check that `now` exists
 cd $ME
