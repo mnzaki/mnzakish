@@ -26,11 +26,12 @@ export MSH_DIR="$MSH_BASE"
 
 case "$1" in
   dir) echo $MSH_DIR;;
+  src) echo "source $MSH_DIR/$2.sh";;
+  lib) echo $MSH_DIR/lib/$2.sh;;
+  conf) echo $HOME_MSH/conf.sh;;
   bashrc)
     echo source $MSH_DIR/bashrc
   ;;
-  lib) echo $MSH_DIR/lib/$2.sh;;
-  conf) echo $HOME_MSH/conf.sh;;
   *)
     if ! grep -q "$MSH_BASE" "$HOME/.bashrc"; then
       echo -e 'export PATH="'"$MSH_BASE/bin"':$PATH"\n$(msh bashrc)' >> "$HOME/.bashrc"
