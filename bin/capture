@@ -26,6 +26,12 @@ CAP_URLS_FILE="$PKB/captured/urls"
 CAP_DATA_DIR="$PKB/captured/data"
 CAP_SCRATCH_FILE="$PKB/CAPTURE.md"
 
+(
+  while read CAP_STDIN; do
+    echo -e "\n$CAP_STDIN\n" >> "$CAP_SCRATCH_FILE"
+  done
+) < /dev/stdin &
+
 # ensure directories exist
 if [ ! -f "$CAP_URLS_FILE" ]; then
   mkdir -p "$(dirname "$CAP_URLS_FILE")"
@@ -75,11 +81,12 @@ else # not a youtube-dl url
   mkdir -p "$CAPTURED"
   CAPTURED="$CAPTURED/$CAP_NAME"
   monolith "$T" -o "$CAPTURED"
+  CAPTURED="file://$CAPTURED"
   ESTATUS=$?
 fi
 
 if [ ! -z "$CAPTURED" ]; then
-  echo "$TIMESTAMP"/"$CAPTURED" "$T" >> "$CAP_URLS_FILE"
+  echo "$CAPTURED" "$T" >> "$CAP_URLS_FILE"
 fi
 
 # I want to know the original url of a file easily
