@@ -8,7 +8,7 @@
 #   DESCRIPTION:
 #
 #       OPTIONS: ---
-#  REQUIREMENTS: mnzakish python-youtube-dl
+#  REQUIREMENTS: mnzakish monolith mpv python-youtube-dl
 #          BUGS: ---
 #         NOTES: ---
 #        AUTHOR: Mina Nagy Zaki (mnzaki), mnzaki@gmail.com
@@ -25,12 +25,6 @@ set -o nounset                                  # Treat unset variables as an er
 CAP_URLS_FILE="$PKB/captured/urls"
 CAP_DATA_DIR="$PKB/captured/data"
 CAP_SCRATCH_FILE="$PKB/CAPTURE.md"
-
-(
-  while read CAP_STDIN; do
-    echo -e "\n$CAP_STDIN\n" >> "$CAP_SCRATCH_FILE"
-  done
-) < /dev/stdin &
 
 # ensure directories exist
 if [ ! -f "$CAP_URLS_FILE" ]; then
@@ -49,6 +43,12 @@ CAPTURED=
 
 # if run without a target, open the scratchpad
 if [ -z "$T" ]; then
+  (
+    while read CAP_STDIN; do
+      echo -e "\n$CAP_STDIN\n" >> "$CAP_SCRATCH_FILE"
+    done
+  ) < /dev/stdin &
+
   msh_focus_or_exec $VISUAL $CAP_SCRATCH_FILE
   exit 0
 fi
@@ -68,7 +68,7 @@ if isytdl "$T"; then
   if [ $ESTATUS -eq 0 ]; then
     CAPTURED="$(realpath "$(ls -1tc | head -n1)")"
     xsel -b <<< "$CAPTURED"
-    mp --fs "$CAPTURED" &
+    mpv --fs "$CAPTURED" &
   else
     echo Failed for "$T"
     exit $ESTATUS
@@ -76,11 +76,11 @@ if isytdl "$T"; then
   popd
 
 else # not a youtube-dl url
-  read CAP_NAME
+  read -p "cature title: " CAP_NAME
   CAPTURED="$CAP_DATA_DIR/$TIMESTAMP"
   mkdir -p "$CAPTURED"
   CAPTURED="$CAPTURED/$CAP_NAME"
-  monolith "$T" -o "$CAPTURED"
+  monolith --no-fonts --no-frames "$T" -o "$CAPTURED"
   CAPTURED="file://$CAPTURED"
   ESTATUS=$?
 fi
@@ -89,6 +89,7 @@ if [ ! -z "$CAPTURED" ]; then
   echo "$CAPTURED" "$T" >> "$CAP_URLS_FILE"
 fi
 
+echo -e "\ncaptured $T to\n$CAPTURED"
 # I want to know the original url of a file easily
 # I want to search through URLs I have saved
 # I want to search through titles and descriptions

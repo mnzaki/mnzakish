@@ -17,7 +17,7 @@ except:
     sys.exit(1)
 
 if is_supported(url):
-    print("yes")
+    print("youtube-dl compatible: " + url)
 else:
-    print("no")
+    print("not youtube-dl compatible: " + url)
     sys.exit(1)
