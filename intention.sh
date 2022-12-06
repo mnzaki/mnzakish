@@ -90,7 +90,7 @@ function diversiondone {
   declare -a STACK
   readarray -t STACK <<<"$(dirs -p)"
   local IDX=$((${#STACK[@]} - 1))
-  INTENTIONS_DONE+=("${STACK[$IDX]}${INTENTIONS[$IDX]}")
+  INTENTIONS_DONE+=("${STACK[$IDX-1]}${INTENTIONS[$IDX]}")
   INTENTIONS[$IDX]=''
   popd
 }
