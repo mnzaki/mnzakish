@@ -19,10 +19,13 @@
 
 #set -o nounset                                  # Treat unset variables as an error
 
+
 MY_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null && pwd )"
 export MSH_DIR=${MSH_DIR:-$MY_DIR}
 export MSH_CONFIG=${MSH_CONFIG:-"$HOME/.config/msh"}
 export MSH_CACHE=${MSH_CACHE:-"$HOME/.cache/msh"}
+
+source "$MSH_DIR/lib/util.inc.sh"
 
 # make $MSH_CONFIG and $MSH_CACHE if it doesn't exist
 mkdir -p "$MSH_CONFIG"
