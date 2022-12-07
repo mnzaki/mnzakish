@@ -3,7 +3,7 @@
 #
 #          FILE: concentration.sh
 #
-#         USAGE: source ./concentration.sh
+#         USAGE: source ./concentration.inc.sh
 #
 #   DESCRIPTION:
 #
@@ -26,7 +26,7 @@ fi
 #set -o nounset                                  # Treat unset variables as an error
 
 BASE="$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" &> /dev/null && pwd )"
-source "$BASE/intention.sh"
+source "$BASE/intention.inc.sh"
 
 CONCENTRATION_MANTRA=(
   conCENTRATE

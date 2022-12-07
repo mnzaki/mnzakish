@@ -33,6 +33,6 @@ mkdir -p "$MSH_CACHE"
 
 # copy the default configuration if it doesn't exist
 # TODO invoke an interactive prompt to do this
-if [ ! -f "$MSH_CONFIG/conf.sh" ]; then
-  cp "$MSH_DIR/conf.sh" "$MSH_CONFIG/conf.sh"
+if [ ! -f "$MSH_CONFIG/conf.inc.sh" ]; then
+  cp "$MSH_DIR/conf.inc.sh" "$MSH_CONFIG/conf.inc.sh"
 fi

@@ -19,16 +19,17 @@
 
 #set -o nounset                                  # Treat unset variables as an error
 
-MSH_BASE="$( cd "$( dirname "$(realpath "${BASH_SOURCE[0]}")")/.." >/dev/null && pwd )"
+MY_BASE="$( cd "$( dirname "$(realpath "${BASH_SOURCE[0]}")")/.." >/dev/null && pwd )"
+MSH_BASE=${MSH_BASE:-$MY_BASE}
 # TODO make it so it can be installed elsewhere
-source "$MSH_BASE/lib/init.sh"
 export MSH_DIR="$MSH_BASE"
+source "$MSH_DIR/lib/init.inc.sh"
 
 case "$1" in
   dir) echo $MSH_DIR;;
-  src) echo "source $MSH_DIR/$2.sh";;
-  lib) echo $MSH_DIR/lib/$2.sh;;
-  conf) echo $HOME_MSH/conf.sh;;
+  src) echo "source $MSH_DIR/$2.inc.sh";;
+  lib) echo $MSH_DIR/lib/$2.inc.sh;;
+  conf) echo $HOME_MSH/conf.inc.sh;;
   bashrc)
     echo source $MSH_DIR/bashrc
   ;;
