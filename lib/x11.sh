@@ -39,7 +39,7 @@ function msh_focus_window_cmd() {
   fi
 
   local ps_path=$(which ps) # avoid aliases
-  local pids="$($ps_path -eo pid,cmd | grep -F "$cmd" | grep -v grep | cut -d" " -f 2)"
+  local pids="$($ps_path -eo pid,cmd | grep -F "$cmd" | grep -v grep | cut -d" " -f 1)"
   if [ "$pids" = "" ]; then
     return 1
   else
