@@ -89,7 +89,9 @@ if [ ! -z "$CAPTURED" ]; then
   echo "$CAPTURED" "$T" >> "$CAP_URLS_FILE"
 fi
 
+echo "$CAPTURED" | xclip -selection clipboard -i
 echo -e "\ncaptured $T to\n$CAPTURED"
+
 # I want to know the original url of a file easily
 # I want to search through URLs I have saved
 # I want to search through titles and descriptions
