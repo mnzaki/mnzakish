@@ -26,6 +26,7 @@ fi
 #set -o nounset                                  # Treat unset variables as an error
 
 STACK_CHAR="${STACK_CHAR:-|}"
+# NOTE: INTENTIONS are listed in chronological order
 INTENTIONS=("${INTENTIONS[@]}")
 INTENTIONS_DONE=("${INTENTIONS_DONE[@]}")
 
@@ -56,11 +57,13 @@ function si {
 
 function getintentions {
   declare -a STACK
+  # NOTE: STACK is in reverse chrono order
   readarray -t STACK <<<"$(dirs -p)"
   local STACKN=${#STACK[@]}
-  for (( idx=0; idx<$STACKN; idx++ )); do
-    echo -n ${STACK[(($idx))]}
-    echo -e "${INTENTIONS[$STACKN - idx - 1]}\n"
+  let STACKN=( $STACKN - 1 )
+  for (( idx=0; idx<=STACKN; idx++ )); do
+    echo -n "${STACK[$idx]}"
+    echo -e "${INTENTIONS[$STACKN-$idx]}\n"
   done
 
   echo "previously:"
