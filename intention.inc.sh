@@ -70,7 +70,13 @@ function getintentions {
 }
 
 function gist {
-  getintentions
+  readarray -t STACK <<<"$(dirs -p)"
+  local STACKN=${#STACK[@]}
+  echo -e "${INTENTIONS[$STACKN-2]#* }"
+}
+
+function gistcommit {
+  git commit -m "$(gist)" --edit
 }
 
 function gi {
