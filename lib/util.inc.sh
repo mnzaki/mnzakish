@@ -3,7 +3,7 @@
 #
 #          FILE: util.inc.sh
 #
-#         USAGE: source ./util.sh
+#         USAGE: source `msh lib util`
 #
 #   DESCRIPTION: utility functions
 #       OPTIONS: pathA pathB

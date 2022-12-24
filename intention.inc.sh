@@ -1,9 +1,9 @@
 #!/bin/bash
 #===============================================================================
 #
-#          FILE: intention.sh
+#          FILE: intention.inc.sh
 #
-#         USAGE: source ./intention.sh
+#         USAGE: source ./intention.inc.sh
 #
 #   DESCRIPTION:
 #

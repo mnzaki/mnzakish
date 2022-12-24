@@ -1,9 +1,9 @@
 #!/bin/bash -
 #===============================================================================
 #
-#          FILE: x11.sh
+#          FILE: x11.inc.sh
 #
-#         USAGE: source ~/.msh/lib/x11.sh
+#         USAGE: source `msh lib x11`
 #
 #   DESCRIPTION: X11 helpers / utilities
 #

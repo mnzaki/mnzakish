@@ -1,7 +1,7 @@
 #!/bin/bash
 #===============================================================================
 #
-#          FILE: concentration.sh
+#          FILE: concentration.inc.sh
 #
 #         USAGE: source ./concentration.inc.sh
 #

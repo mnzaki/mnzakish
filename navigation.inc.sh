@@ -1,9 +1,9 @@
 #!/bin/bash -
 #===============================================================================
 #
-#          FILE: navigation.sh
+#          FILE: navigation.inc.sh
 #
-#         USAGE: ./navigation.sh
+#         USAGE: source ./navigation.sh
 #
 #   DESCRIPTION:
 #

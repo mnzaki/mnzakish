@@ -1,3 +1,5 @@
+# This file is meant to remain in the installation directory, and be sourced
+# from ~/.bashrc either directly or via `msh bashrc`
 export MSH_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 export PATH="$MSH_DIR/bin:$PATH"
 

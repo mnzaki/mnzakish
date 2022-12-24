@@ -1,9 +1,9 @@
 #!/bin/bash -
 #===============================================================================
 #
-#          FILE: fndispatch.sh
+#          FILE: fndispatch.inc.sh
 #
-#         USAGE: source ~/.msh/lib/fndispatch.sh
+#         USAGE: source `msh lib fndispatch`
 #
 #   DESCRIPTION: Dispatch to functions based on the script name
 #                useful for `ln -s` to a script that houses a bunch of different
