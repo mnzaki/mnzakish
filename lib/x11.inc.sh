@@ -18,7 +18,7 @@
 #===============================================================================
 
 _msh_base="$(dirname "${BASH_SOURCE[0]}")/.."
-source "$_msh_base/lib/fndispatch.sh"
+source "$_msh_base/lib/fndispatch.inc.sh"
 
 # Focus an x11 window owned by a process with the given command line
 # or execute the command line if no such window
@@ -39,7 +39,8 @@ function msh_focus_window_cmd() {
   fi
 
   local ps_path=$(which ps) # avoid aliases
-  local pids="$($ps_path -eo pid,cmd | grep -F "$cmd" | grep -v grep | cut -d" " -f 1)"
+  echo "grepping for $cmd"
+  local pids="$($ps_path -eo pid,cmd | grep -F "$cmd" | grep -v grep | awk '{print $1}')"
   if [ "$pids" = "" ]; then
     return 1
   else
