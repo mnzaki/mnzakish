@@ -22,7 +22,7 @@ source "$_msh_base/lib/fndispatch.inc.sh"
 
 # Focus an x11 window owned by a process with the given command line
 # or execute the command line if no such window
-function msh_focus_or_exec() {
+function _msh_focus_or_exec() {
   if [ "$1" = "" ]; then
     return 1
   fi
@@ -32,7 +32,7 @@ function msh_focus_or_exec() {
 }
 
 # Focus an x11 window owned by a process with the given command line
-function msh_focus_window_cmd() {
+function _msh_focus_window_cmd() {
   local cmd="$@"
   if [ "$cmd" = "" ]; then
     return 1
@@ -50,7 +50,7 @@ function msh_focus_window_cmd() {
 }
 
 # Focus x11 windows owned by a process with the given PIDs
-function msh_focus_window_pids() {
+function _msh_focus_window_pids() {
   if [ "$@" = "" ]; then
     return 1
   fi
