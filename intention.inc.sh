@@ -27,7 +27,7 @@ fi
 
 STACK_CHAR="${STACK_CHAR:-|}"
 # NOTE: INTENTIONS are listed in chronological order
-INTENTIONS=("${INTENTIONS[@]}")
+declare -A INTENTIONS
 INTENTIONS_DONE=("${INTENTIONS_DONE[@]}")
 
 PS1_ADDITION='\[[38;5;7m\]\[[38;1;7m\]$(printdirstack)'
@@ -46,9 +46,13 @@ function readintention {
 
 function setintention {
   local INTENTION="$(readintention "$@")"
-  local NSTACK=$(dirs -p | wc -l)
-  local PRE_INTENTION="${INTENTIONS[ (( $NSTACK - 1 )) ]}"
-  INTENTIONS[(( $NSTACK - 1 ))]="$PRE_INTENTION\n$INTENTION"
+  local NSTACK=$(($(dirs -p | wc -l)))
+  local PRE_INTENTION="${INTENTIONS[$((NSTACK-1))]}"
+  INTENTIONS[$((NSTACK-1))]="$PRE_INTENTION\n$INTENTION"
+}
+
+function si {
+  setintention "$@"
 }
 
 function si {
@@ -56,26 +60,27 @@ function si {
 }
 
 function getintentions {
-  declare -a STACK
-  # NOTE: STACK is in reverse chrono order
-  readarray -t STACK <<<"$(dirs -p)"
-  local STACKN=${#STACK[@]}
-  let STACKN=( $STACKN - 1 )
-  for (( idx=0; idx<=STACKN; idx++ )); do
-    echo -n "${STACK[$idx]}"
-    echo -e "${INTENTIONS[$STACKN-$idx]}\n"
-  done
-
-  echo "previously:"
+  echo "done:"
   for (( idx=0; idx<${#INTENTIONS_DONE[@]}; idx++ )); do
     echo -e "${INTENTIONS_DONE[$idx]}\n"
+  done
+
+  echo -e "\nnow:"
+  declare -a STACK
+  # STACK is in reverse chrono order
+  readarray -t STACK <<<"$(dirs -p)"
+  local NSTACK=${#STACK[@]}
+  for (( idx=$NSTACK; idx>0; idx-- )); do
+    local ENTRY="${STACK[$idx-1]}\n${INTENTIONS[$(($NSTACK-$idx))]}"
+    echo -e "$ENTRY\n"
   done
 }
 
 function gist {
+  declare -a STACK
   readarray -t STACK <<<"$(dirs -p)"
-  local STACKN=${#STACK[@]}
-  echo -e "${INTENTIONS[$STACKN-2]#* }"
+  local IDX=$((${#STACK[@]}-1))
+  echo -e "${INTENTIONS[$IDX]#* }"
 }
 
 function gistcommit {
@@ -99,8 +104,8 @@ function diversiondone {
   declare -a STACK
   readarray -t STACK <<<"$(dirs -p)"
   local IDX=$((${#STACK[@]} - 1))
-  INTENTIONS_DONE+=("${STACK[$IDX-1]}${INTENTIONS[$IDX]}")
-  INTENTIONS[$IDX]=''
+  INTENTIONS_DONE+=("${STACK[0]}${INTENTIONS[$IDX]}")
+  unset INTENTIONS[$IDX]
   popd
 }
 
