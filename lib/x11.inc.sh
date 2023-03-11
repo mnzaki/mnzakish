@@ -17,8 +17,14 @@
 #      REVISION:  ---
 #===============================================================================
 
-_msh_base="$(dirname "${BASH_SOURCE[0]}")/.."
-source "$_msh_base/lib/fndispatch.inc.sh"
+# WM specific functions
+#
+if pgrep awesome &>/dev/null; then
+  source "$MSH_DIR/lib/awesomewm.inc.sh"
+fi
+
+# General functions
+#
 
 # Focus an x11 window owned by a process with the given command line
 # or execute the command line if no such window
