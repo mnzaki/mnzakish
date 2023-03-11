@@ -1,0 +1,196 @@
+#!/bin/bash -
+#===============================================================================
+#
+#          FILE: activity
+#
+#         USAGE: ./activity
+#
+#   DESCRIPTION:
+#
+#       OPTIONS: ---
+#  REQUIREMENTS: ---
+#          BUGS: ---
+#         NOTES: ---
+#        AUTHOR: Mina Nagy Zaki (mnzaki), mnzaki@gmail.com
+#  ORGANIZATION: mnzaki.com
+#       CREATED: 21.12.2022 22:52:43
+#      REVISION:  ---
+#===============================================================================
+
+set -o nounset                                  # Treat unset variables as an error
+
+`msh src lib/pkb`
+`msh src lib/x11`
+`msh src lib/fsdb`
+`msh src lib/activity`
+
+_msh_choose_or_create() {
+  local NEW_VAL CHOSEN
+  declare -n ARR_VAR="$1"
+  declare -a RESULT
+
+  IFS='' RESULT=($(printf '%s\n' "${ARR_VAR[@]}" | fzf --print-query))
+  if [[ $? -eq 130 || ${#RESULT[*]} -eq 0 ]]; then
+    # fzf was CTRL-Ced, or something
+    return 1
+  fi
+
+  NEW_VAL="${RESULT[0]}"
+  if [ ! -z $NEW_VAL ]; then
+    ARR_VAR+=("$NEW_VAL")
+    CHOSEN="$NEW_VAL"
+  else
+    CHOSEN="${RESULT[1]}"
+  fi
+  CHOSEN="${CHOSEN##[[:space:]]}"
+  echo "$CHOSEN"
+
+  return 0
+}
+
+_msh_fzf_choose_or_create() {
+  local RECENT_FILE NEW_VAL CHOSEN RESULT
+  RECENT_FILE="$1"
+  touch "$RECENT_FILE"
+  declare -a RESULT
+
+  readarray -t RESULT < <(fzf --print-query < "$RECENT_FILE")
+  if [[ $? -eq 130 || ${#RESULT[*]} -eq 0 ]]; then
+    # fzf was CTRL-Ced, or something
+    echo woops $?
+    return 1
+  fi
+
+  if [ ${#RESULT[*]} -eq 2 ]; then
+    CHOSEN="${RESULT[1]}"
+  else
+    CHOSEN="${RESULT[0]}"
+    _msh_fsdb_LIF_shift_unique $RECENT_FILE "$CHOSEN"
+  fi
+  echo "$CHOSEN"
+
+  return 0
+}
+
+_msh_dmenu_choose_or_create() {
+  local RECENT_FILE CHOSEN
+  RECENT_FILE="$1"
+  touch "$RECENT_FILE"
+
+  CHOSEN=$(dmenu -p activity < "$RECENT_FILE")
+  if [[ $? -ne 0 ]]; then
+    # dmenu was CTRL-Ced, or something
+    return 1
+  fi
+
+  _msh_fsdb_LIF_shift_unique $RECENT_FILE "$CHOSEN"
+  echo "$CHOSEN"
+
+  return 0
+}
+
+_msh_dmenu_choose_or_create_dir() {
+  local FROM_DIR CHOSEN
+  FROM_DIR="$1"
+  mkdir -p "$FROM_DIR"
+
+  CHOSEN=$(cd "$FROM_DIR"; command ls -1t | dmenu -p activity)
+  if [ $? -ne 0 ]; then
+    # dmenu was CTRL-Ced, or something
+    return 1
+  fi
+
+  echo "$CHOSEN"
+}
+
+_msh_activity_pick_or_create() {
+  # pick an activity from recent
+  local ACTIVITY="$(_msh_dmenu_choose_or_create_dir "$ACTIVITIES_DIR")"
+
+  if [ -z "$ACTIVITY" ]; then
+    #debug echo "no activity"
+    return 1
+  fi
+
+  _msh_activity__set "$ACTIVITY"
+  echo $ACTIVITY
+}
+
+#### Activity Types
+##
+
+_msh_activity_station() {
+  _msh_wm_view_group_by_purpose "$ACTIVITY_SLUG"
+  _msh_focus_or_exec $TERMINAL tmuxstart "$ACTIVITY_SLUG" &
+  #sleep 1
+  #_msh_wm_set_current_group_purpose "$ACTIVITY"
+}
+
+_msh_activity_station_run_once() {
+  tmuxstart "$ACTIVITY" "$@"
+}
+
+_msh_activity_run_once() {
+  local COMMAND="$1" ACTIVITY_PID
+  local ACTIVITY_COMMAND_PIDS=()
+  # list all child processes of activity[$ACTIVITY]
+  #debug echo pgrep "${PROCESS_NAME:0:16}"
+  #debug pgrep "${PROCESS_NAME:0:16}"
+  for ACTIVITY_PID in $(pgrep "${PROCESS_NAME:0:16}"); do
+    #debug echo ACTIVITY_PID $ACTIVITY_PID
+    #debug echo ACTIVITY_COMMAND_PIDS
+    #debug pgrep -lP $ACTIVITY_PID | grep "$COMMAND"
+    ACTIVITY_COMMAND_PIDS+=($(pgrep -lP $ACTIVITY_PID | grep "$COMMAND" | awk '{print $1}'))
+  done
+
+  if [ ${#ACTIVITY_COMMAND_PIDS[@]} -gt 0 ]; then
+    # there are processes for this command for this activity
+    # so focus their windows
+    _msh_focus_window_pids ${ACTIVITY_COMMAND_PIDS[@]}
+  else
+    shift
+    $COMMAND "$@"
+  fi
+}
+
+_msh_activity_rofi() {
+  local COMMAND=$(
+    rofi -run-command "echo '{cmd}'" -show combi -modes combi -combi-modes "window,run,drun"
+  )
+  if [ -z "$COMMAND" ]; then return 1; fi
+  _msh_activity_station
+  _msh_activity_station_run_once "$COMMAND"
+}
+
+##
+#### Main
+##
+while getopts ":p" OPT; do
+  case "$OPT" in
+    p) _msh_activity_pick_or_create || exit 1;;
+  esac
+done
+shift $((OPTIND-1))
+
+ACTIVITIES=($(command ls -1t "$ACTIVITIES_DIR"))
+if [ ${#ACTIVITIES} -eq 0 ]; then
+  echo no activity
+  exit 1
+fi
+
+[ ${#ACTIVITIES} -gt 0 ] && _msh_activity__set "${ACTIVITIES[0]}"
+
+# execute the activity type or command
+#
+COMMAND="_msh_activity_${1:-station}"
+if ! type -t $COMMAND &>/dev/null; then
+  COMMAND="_msh_activity_run_once"
+else
+  shift
+fi
+
+# process name is the current activity so we can grep later
+PROCESS_NAME="#$ACTIVITY_SLUG"
+
+echo "$PROCESS_NAME" > /proc/$$/comm
+$COMMAND "$@"
