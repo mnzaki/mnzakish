@@ -33,39 +33,38 @@ if [ -f "$PREVIOUS_MENOW" ]; then
   exec $EDITOR "$PREVIOUS_MENOW"
 fi
 
-FULL_FILE_NAME="${TIMESTAMP}$TITLE$FILE_EXT"
 
 # Check that `now` exists
-cd $ME
+pushd $ME
 NOW=$(date +%Y)
 if ! ls -l now | grep -q $NOW; then
   # and link it if it doesn't
   mkdir -p "$NOW"
-  ln -sr $NOW now
+  ln -srf $NOW now
 fi
 MENOW="$ME/now"
+popd
+
+FULL_FILE_PATH="$MENOW/${TIMESTAMP}$TITLE$FILE_EXT"
 
 case `basename "$0"` in
   menow)
-    cd $MENOW
     ;;
   todayi)
-    cd $MENOW
-    FULL_FILE_NAME="`date +%m%d`_today_I$FILE_EXT"
+    FULL_FILE_PATH="$MENOW/`date +%m%d`_today_I$FILE_EXT"
     set -x
-    echo "## [" `date +%T` "]" >> "$FULL_FILE_NAME"
-    if [ "$1" != "" ]; then
-      echo "- $@" >> "$FULL_FILE_NAME"
+    echo "## [" `date +%T` "]" >> "$FULL_FILE_PATH"
+    if [ -n "$1" ]; then
+      echo "- $@" >> "$FULL_FILE_PATH"
       exit 0
-    else
-      exec $EDITOR "$FULL_FILE_NAME"
     fi
     ;;
   herenow)
+    ln -s "$FULL_FILE_PATH" .
     ;;
 esac
 
 set -x
 # we echo this at the top of the file, as a reference to the previous file
-echo "$POSSIBLY_FILE" >> "$FULL_FILE_NAME"
-exec $EDITOR "$FULL_FILE_NAME"
+[ -n "$POSSIBLY_FILE" ] && echo "$POSSIBLY_FILE" >> "$FULL_FILE_PATH"
+exec $EDITOR "$FULL_FILE_PATH"
