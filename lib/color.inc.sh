@@ -1,9 +1,9 @@
 #!/bin/bash -
 #===============================================================================
 #
-#          FILE: color.sh
+#          FILE: color.inc.sh
 #
-#         USAGE: ./color.sh
+#         USAGE: source $(msh lib color)
 #
 #   DESCRIPTION:
 #

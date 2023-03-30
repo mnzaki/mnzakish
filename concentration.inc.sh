@@ -70,6 +70,7 @@ AND_GROUNDS=
 
 function concentration {
   local EXIT_CODE=${1:-$?}
+  local BWhiteOnBlack='\e[1;37;40m' # Bold White
 
   if [ $EXIT_CODE -eq 130 ]; then # it was a Control-C
     # so increment the CCCCount
@@ -98,7 +99,9 @@ function concentration {
         echo concentrate
         while [ $CONCENTRATION_TIMES -lt $CCCCount ]; do
           local CONC_IDX=$(( (CONCENTRATION_TIMES+CONC_IDX_OFFSET) % NUM_MANTRAS))
-          echo ${CONCENTRATION_MANTRA[$CONC_IDX]}
+          local MANTRA=${CONCENTRATION_MANTRA[$CONC_IDX]}
+          local BOLDBIT=
+          echo -e ${MANTRA:0:$CONC_IDX}$BWhiteOnBlack${MANTRA:$CONC_IDX:3}'\e[0m'${MANTRA:$((CONC_IDX+3))}
           (( CONCENTRATION_TIMES++ ))
         done
       ) <(getintentions | head -n $((CCCCount-1)) )

@@ -3,7 +3,7 @@
 #
 #          FILE: init.sh
 #
-#         USAGE: ./init.sh
+#         USAGE: source `msh lib init`
 #
 #   DESCRIPTION:
 #
@@ -24,12 +24,12 @@ MY_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null && pwd )"
 export MSH_DIR=${MSH_DIR:-$MY_DIR}
 export MSH_CONFIG=${MSH_CONFIG:-"$HOME/.config/msh"}
 export MSH_CACHE=${MSH_CACHE:-"$HOME/.cache/msh"}
+export MSH_LOCAL=${MSH_LOCAL:-"$HOME/.local/share/msh"}
 
 source "$MSH_DIR/lib/util.inc.sh"
 
-# make $MSH_CONFIG and $MSH_CACHE if it doesn't exist
-mkdir -p "$MSH_CONFIG"
-mkdir -p "$MSH_CACHE"
+# ensure dirs exist
+mkdir -p "$MSH_CONFIG" "$MSH_CACHE" "$MSH_LOCAL"
 
 # copy the default configuration if it doesn't exist
 # TODO invoke an interactive prompt to do this
