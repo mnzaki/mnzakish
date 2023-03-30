@@ -21,7 +21,7 @@
 
 # if parent script is being invoked directly (not being sourced)
 # then execute the function named by the parent script's file name
-function msh_fndispatch() {
+function _msh_fndispatch() {
   # NOTE: checking against  [-1] (parent shell)
   if [ "$0" = "${BASH_SOURCE[-1]}" ]; then
     COMMAND=$(basename "$0")
@@ -37,7 +37,7 @@ function msh_fndispatch() {
 # if the parent shell is being invoked directly (not being sourced)
 # then run the supplied command line using 'exec'
 # otherwise just run it normally (don't take over the process)
-function msh_fndispatch_exec() {
+function _msh_fndispatch_exec() {
   # NOTE: checking against  [-1] (parent shell)
   if [ "$0" = "${BASH_SOURCE[-1]}" ]; then
     exec $@
