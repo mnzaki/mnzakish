@@ -1,0 +1,88 @@
+#!/bin/bash
+
+# based on https://github.com/treyhunner/tmuxstart
+
+sessiondir=${TMUXSTART_DIR:-$HOME/.tmux/tmuxstart}
+ts_name=$(basename $0)
+
+# Print usage information if there's not enough arguments
+usage() {
+    echo "Usage: ${ts_name} [OPTIONS] SESSION"
+    echo "Launch reusable configurations for named tmux sessions."
+    echo "Options:"
+    echo "-h Print help menu"
+    echo "-l List all available session files"
+    echo "-v Print ${ts_name} version number"
+}
+
+if [ $# -lt 1 ]; then
+  exec tmux new-session
+fi
+
+# local functions
+_print_version() {
+    local version
+    version='0.2.0-dev'
+    echo "${ts_name} ${version}"
+}
+
+# arguments parsing loop
+while getopts ':hlv' option; do
+    case "${option}" in
+        h)
+            usage ; exit 0 ;;
+        l)
+            ls  $sessiondir ; exit 0 ;;
+        v)
+            _print_version ; exit 0 ;;
+        *)
+            echo "Invalid option"
+            usage ; exit 1
+            ;;
+    esac
+done
+
+# Some helper functions for simpler session files
+new_session() {
+    # Set default path based on $path variable if defined
+    [ "$path" ] && cd "$path"
+    tmux new-session -d -s $session "$@"
+    [ "$path" ] && set_path "$path"
+}
+new_window() { tmux new-window -d -t $session "$@"; }
+rename() { tmux rename-window -t $session:"$@"; }
+kill_window() { tmux kill-window -t $session:"$@"; }
+select_pane() { tmux select-pane -t $session:"$@"; }
+select_window() { tmux select-window -t $session:"$@"; }
+select_layout() { tmux select-layout -t $session:"$@"; }
+send_keys() { tmux send-keys -t $session:"$@"; }
+send_line() { send_keys "$@" "Enter"; }
+set_env() { tmux set-environment -t $session "$@"; }
+set_path() { tmux set-option -t $session default-path "$@"; }
+split() { tmux split-window -t $session:"$@"; }
+swap() { tmux swap-pane -t $session:"$@"; }
+
+# replace space with dash for easier string handling
+session=${1// /-}
+
+# if we don't already have a session
+if ! tmux has-session -t "$session"; then
+    # start a session in the backgroun
+    tmux new-session -d -s "$session"
+    # try to tmux-resurrect it
+    ~/.tmux/plugins/tmux-resurrect/scripts/restore.sh "$session"
+
+    #if [ -f "$sessiondir/$1" ] ; then
+    #  # and load the session startup script if it exists
+    #    . "$sessiondir/$1"
+    #fi
+fi
+
+# Execute command in new window if given a command after session name
+if [ $# -gt 1 ]; then
+  shift
+  new_window "$@"
+else
+  # or otherwise attach to the session
+  exec tmux attach-session -t $session
+fi
