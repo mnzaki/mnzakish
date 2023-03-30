@@ -49,7 +49,7 @@ if [ -z "$T" ]; then
     done
   ) < /dev/stdin &
 
-  msh_focus_or_exec $VISUAL $CAP_SCRATCH_FILE
+  _msh_focus_or_exec $VISUAL $CAP_SCRATCH_FILE
   exit 0
 fi
 
