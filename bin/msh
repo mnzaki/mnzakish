@@ -25,7 +25,12 @@ MSH_BASE=${MSH_BASE:-$MY_BASE}
 export MSH_DIR="$MSH_BASE"
 source "$MSH_DIR/lib/init.inc.sh"
 
+if ! grep -q "$MSH_BASE" "$HOME/.bashrc"; then
+  echo -e 'export PATH="'"$MSH_BASE/bin"':$PATH"\n$(msh bashrc)' >> "$HOME/.bashrc"
+fi
+
 case "$1" in
+  '') echo "msh usage";;
   dir) echo $MSH_DIR;;
   src) echo "source $MSH_DIR/$2.inc.sh";;
   lib) echo $MSH_DIR/lib/$2.inc.sh;;
@@ -34,7 +39,37 @@ case "$1" in
     echo source $MSH_DIR/bashrc
   ;;
   *)
-    if ! grep -q "$MSH_BASE" "$HOME/.bashrc"; then
-      echo -e 'export PATH="'"$MSH_BASE/bin"':$PATH"\n$(msh bashrc)' >> "$HOME/.bashrc"
+    #debug echo args "$@"
+    if [ "$1" = "debug" ]; then
+      export DEBUG=$1
+      shift
     fi
+
+    MSH_LIB="$MSH_DIR/lib/$1.inc.sh"
+
+    if [ -f "$MSH_LIB" ]; then
+      SOURCE_FILE="$MSH_LIB"
+      MSH_CMD="_msh_${2}"
+    else
+      SOURCE_FILE="$(which "$1")"
+      MSH_CMD="$2"
+    fi
+
+
+    if [ "$SOURCE_FILE" == "$MSH_LIB" ]; then
+      #debug echo -e "MSH_LIB $MSH_LIB \n MSH_CMD $MSH_CMD"
+      shift 2
+      if [ "$DEBUG" ]; then
+        SOURCE_FILE_DEBUG=`mktemp`
+        sed 's/#debug //' < "$SOURCE_FILE" > "$SOURCE_FILE_DEBUG"
+        source "$SOURCE_FILE_DEBUG"
+        rm "$SOURCE_FILE_DEBUG"
+      else
+        source "$SOURCE_FILE"
+      fi
+    else
+      # we have done nothing useful
+      exec "$@"
+    fi
+  ;;
 esac
