@@ -17,34 +17,12 @@
 #      REVISION:  ---
 #===============================================================================
 
+`msh src lib/pkb`
+
 ACTIVITIES_DIR="$PKB/activity"
 CACHE_DIR="$MSH_CACHE/activity"
-ACTIVITY_SLUG=
-ACTIVITY_DIR=
-ACTIVITY_CACHE_DIR=
-ACTIVITY=
-ACTIVITIES=
-
-#TERMINAL_CMD="${TERMINAL:-xterm} -g 120x20 -c fzfmenu -z 18"
-
 mkdir -p "$ACTIVITIES_DIR" "$CACHE_DIR"
-
-_msh_activity__ls() {
-  ACTIVITIES=($(command ls -1t "$ACTIVITIES_DIR"))
-}
-_msh_activity__ls
-_msh_activity_ls() {
-  _msh_activity__ls
-  echo "${ACTIVITIES[*]}"
-}
-
-
-_msh_activity__vars() {
-  ACTIVITY_SLUG=${ACTIVITY// /-}
-  ACTIVITY_DIR="$ACTIVITIES_DIR/$ACTIVITY"
-  ACTIVITY_CACHE_DIR="$CACHE_DIR/$ACTIVITY"
-  #_msh_fsdb_pvar ACTIVITY_WM_IDX "$ACTIVITY_DIR/wm_idx"
-}
+ACTIVITY=${ACTIVITY:-}
 
 _msh_activity__set() {
   ACTIVITY="${1}"
@@ -80,3 +58,27 @@ _msh_activity__set() {
   ##
 }
 
+_msh_activity__vars() {
+  ACTIVITY_SLUG=${ACTIVITY// /-}
+  ACTIVITY_DIR="$ACTIVITIES_DIR/$ACTIVITY"
+  ACTIVITY_CACHE_DIR="$CACHE_DIR/$ACTIVITY"
+  #_msh_fsdb_pvar ACTIVITY_WM_IDX "$ACTIVITY_DIR/wm_idx"
+}
+
+_msh_activity_load_from_disk() {
+  ACTIVITIES=($(command ls -1t "$ACTIVITIES_DIR"))
+  if [ ${#ACTIVITIES} -gt 0 ]; then
+    _msh_activity__set "${ACTIVITIES[0]}"
+  fi
+}
+
+_msh_activity_ls() {
+  _msh_activity_load_from_disk
+  echo "${ACTIVITIES[*]}"
+}
+
+if [ -n "$ACTIVITY" ]; then
+  _msh_activity__vars
+else # if we don't already have an environment
+  _msh_activity_load_from_disk
+fi

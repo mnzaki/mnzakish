@@ -121,9 +121,7 @@ _msh_activity_pick_or_create() {
 
 _msh_activity_station() {
   _msh_wm_view_group_by_purpose "$ACTIVITY_SLUG"
-  _msh_focus_or_exec $TERMINAL tmuxstart "$ACTIVITY_SLUG" &
-  #sleep 1
-  #_msh_wm_set_current_group_purpose "$ACTIVITY"
+  _msh_focus_or_exec $TERMINAL tmuxstart ${ACTIVITY_SLUG}
 }
 
 _msh_activity_station_run_once() {
@@ -172,13 +170,11 @@ while getopts ":p" OPT; do
 done
 shift $((OPTIND-1))
 
-ACTIVITIES=($(command ls -1t "$ACTIVITIES_DIR"))
+_msh_activity_load_from_disk
 if [ ${#ACTIVITIES} -eq 0 ]; then
   echo no activity
   exit 1
 fi
-
-[ ${#ACTIVITIES} -gt 0 ] && _msh_activity__set "${ACTIVITIES[0]}"
 
 # execute the activity type or command
 #

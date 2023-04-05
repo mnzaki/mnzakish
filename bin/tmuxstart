@@ -2,6 +2,9 @@
 
 # based on https://github.com/treyhunner/tmuxstart
 
+`msh src lib/init`
+`msh src lib/activity`
+
 sessiondir=${TMUXSTART_DIR:-$HOME/.tmux/tmuxstart}
 ts_name=$(basename $0)
 
@@ -65,10 +68,14 @@ swap() { tmux swap-pane -t $session:"$@"; }
 # replace space with dash for easier string handling
 session=${1// /-}
 
+if [ -n "$ACTIVITY_DIR" ]; then
+  SESSION_ACTIVITY_DIR="-c $ACTIVITY_DIR"
+fi
+
 # if we don't already have a session
 if ! tmux has-session -t "$session"; then
     # start a session in the backgroun
-    tmux new-session -d -s "$session"
+    tmux new-session -d -s "$session" $SESSION_ACTIVITY_DIR
     # try to tmux-resurrect it
     ~/.tmux/plugins/tmux-resurrect/scripts/restore.sh "$session"
 
@@ -78,11 +85,12 @@ if ! tmux has-session -t "$session"; then
     #fi
 fi
 
+shift
+
 # Execute command in new window if given a command after session name
 if [ $# -gt 1 ]; then
-  shift
-  new_window "$@"
+  new_window $SESSION_ACTIVITY_DIR "$@"
 else
   # or otherwise attach to the session
-  exec tmux attach-session -t $session
+  exec tmux attach-session $SESSION_ACTIVITY_DIR -t $session
 fi
