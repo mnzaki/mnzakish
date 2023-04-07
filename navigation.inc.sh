@@ -58,17 +58,22 @@ function j() {
 function jf() {
   local FZF_HIST="$MSH_CACHE/jf_hist"
   local TARGET_CMD="${@-"xdg-open"}"
-  #if [[ "$TARGET_CMD" == "" ]]; then
-    #echo "Usage: jf CMD"
-    #echo "fuzzy find a file and run CMD on it"
-  #fi
+
+  while getopts ":e" opt
+  do
+    case $opt in
+      e) TARGET_CMD=$EDITOR;;
+    esac
+  done
+  shift $(($OPTIND-1))
+
   set -x
   local JUMP_TO="$($PATH_LIST_CMD . | fzf --history="$FZF_HIST")"
+  xsel -b <<<$JUMP_TO
   set +x
   if [[ "$JUMP_TO" != "" ]]; then
     set -x
     $TARGET_CMD "$JUMP_TO"
     set +x
   fi
-  echo -b $JUMP_TO | xsel -b
 }
