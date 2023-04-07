@@ -163,9 +163,10 @@ _msh_activity_rofi() {
 ##
 #### Main
 ##
-while getopts ":p" OPT; do
+while getopts "ps:" OPT; do
   case "$OPT" in
     p) _msh_activity_pick_or_create || exit 1;;
+    s) _msh_activity__set "$OPTARG"; exit;;
   esac
 done
 shift $((OPTIND-1))

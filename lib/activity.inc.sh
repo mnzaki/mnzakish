@@ -68,7 +68,8 @@ _msh_activity__vars() {
 _msh_activity_load_from_disk() {
   ACTIVITIES=($(command ls -1t "$ACTIVITIES_DIR"))
   if [ ${#ACTIVITIES} -gt 0 ]; then
-    _msh_activity__set "${ACTIVITIES[0]}"
+    ACTIVITY="${ACTIVITIES[0]}"
+    _msh_activity__vars
   fi
 }
 
