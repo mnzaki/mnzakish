@@ -88,7 +88,7 @@ fi
 shift
 
 # Execute command in new window if given a command after session name
-if [ $# -gt 1 ]; then
+if [ $# -ge 1 ]; then
   new_window $SESSION_ACTIVITY_DIR "$@"
 else
   # or otherwise attach to the session
