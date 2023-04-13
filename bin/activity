@@ -94,7 +94,7 @@ _msh_dmenu_choose_or_create_dir() {
   FROM_DIR="$1"
   mkdir -p "$FROM_DIR"
 
-  CHOSEN=$(cd "$FROM_DIR"; command ls -1t | dmenu -p activity)
+  CHOSEN=$(cd "$FROM_DIR"; command ls -1t | dmenu -b -p activity)
   if [ $? -ne 0 ]; then
     # dmenu was CTRL-Ced, or something
     return 1
@@ -124,32 +124,32 @@ _msh_activity_station() {
   _msh_focus_or_exec $TERMINAL tmuxstart ${ACTIVITY_SLUG}
 }
 
-_msh_activity_station_run_once() {
+_msh_activity_station_run() {
   tmuxstart "$ACTIVITY" "$@"
 }
 
-_msh_activity_run_once() {
-  local COMMAND="$1" ACTIVITY_PID
-  local ACTIVITY_COMMAND_PIDS=()
-  # list all child processes of activity[$ACTIVITY]
-  #debug echo pgrep "${PROCESS_NAME:0:16}"
-  #debug pgrep "${PROCESS_NAME:0:16}"
-  for ACTIVITY_PID in $(pgrep "${PROCESS_NAME:0:16}"); do
-    #debug echo ACTIVITY_PID $ACTIVITY_PID
-    #debug echo ACTIVITY_COMMAND_PIDS
-    #debug pgrep -lP $ACTIVITY_PID | grep "$COMMAND"
-    ACTIVITY_COMMAND_PIDS+=($(pgrep -lP $ACTIVITY_PID | grep "$COMMAND" | awk '{print $1}'))
-  done
-
-  if [ ${#ACTIVITY_COMMAND_PIDS[@]} -gt 0 ]; then
-    # there are processes for this command for this activity
-    # so focus their windows
-    _msh_focus_window_pids ${ACTIVITY_COMMAND_PIDS[@]}
-  else
-    shift
-    $COMMAND "$@"
-  fi
-}
+#_msh_activity_run_once() {
+#  local ACTIVITY_COMMAND_PIDS=()
+#  local ACTIVITY_PID
+#  # list all child processes of activity[$ACTIVITY]
+#  #debug echo pgrep "${PROCESS_NAME:0:16}"
+#  #debug pgrep "${PROCESS_NAME:0:16}"
+#  for ACTIVITY_PID in $(pgrep "${PROCESS_NAME:0:16}"); do
+#    #debug echo ACTIVITY_PID $ACTIVITY_PID
+#    #debug echo ACTIVITY_COMMAND_PIDS
+#    #debug pgrep -lP $ACTIVITY_PID | grep "$COMMAND"
+#    ACTIVITY_COMMAND_PIDS+=($(pgrep -lP $ACTIVITY_PID | grep "$COMMAND" | awk '{print $1}'))
+#  done
+#
+#  if [ ${#ACTIVITY_COMMAND_PIDS[@]} -gt 0 ]; then
+#    # there are processes for this command for this activity
+#    # so focus their windows
+#    _msh_focus_window_pids ${ACTIVITY_COMMAND_PIDS[@]}
+#  else
+#    shift
+#    $COMMAND "$@"
+#  fi
+#}
 
 _msh_activity_rofi() {
   local COMMAND=$(
@@ -157,7 +157,7 @@ _msh_activity_rofi() {
   )
   if [ -z "$COMMAND" ]; then return 1; fi
   _msh_activity_station
-  _msh_activity_station_run_once "$COMMAND"
+  _msh_activity_station_run $COMMAND
 }
 
 ##
@@ -177,17 +177,22 @@ if [ ${#ACTIVITIES} -eq 0 ]; then
   exit 1
 fi
 
-# execute the activity type or command
-#
+# prepare to execute any defined subcommands, "station" by default
 COMMAND="_msh_activity_${1:-station}"
-if ! type -t $COMMAND &>/dev/null; then
-  COMMAND="_msh_activity_run_once"
-else
+if type -t $COMMAND &>/dev/null; then
+  # if the command name exists, then the rest of the arguments are for this
+  # subcommand
   shift
+else
+  # if there's no such command, then we assume the user provided a bin in $PATH
+  # and we use our station_run command
+  COMMAND="_msh_activity_station_run"
 fi
 
-# process name is the current activity so we can grep later
+# process name is the current activity so we can pgrep later
 PROCESS_NAME="#$ACTIVITY_SLUG"
 
+# this updates the name visible through pgrep
 echo "$PROCESS_NAME" > /proc/$$/comm
+exec -a "$PROCESS_NAME"
 $COMMAND "$@"
