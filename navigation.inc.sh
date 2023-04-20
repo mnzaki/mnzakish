@@ -57,23 +57,35 @@ function j() {
 # jump to file and run CMD
 function jf() {
   local FZF_HIST="$MSH_CACHE/jf_hist"
-  local TARGET_CMD="${@-"xdg-open"}"
+  local TARGET_CMD
+  local X11_MODIFIER
 
-  while getopts ":e" opt
+  local OPTIND=1
+  while getopts ":ex" opt
   do
     case $opt in
       e) TARGET_CMD=$EDITOR;;
+      x) X11_MODIFIER=1;;
     esac
   done
-  shift $(($OPTIND-1))
 
-  set -x
+  shift $((OPTIND-1))
+
+  if [ $# -gt 0 ]; then
+    TARGET_CMD="$@"
+  fi
+
+  TARGET_CMD="${TARGET_CMD:-"xdg-open"}"
+
   local JUMP_TO="$($PATH_LIST_CMD . | fzf --history="$FZF_HIST")"
-  xsel -b <<<$JUMP_TO
-  set +x
   if [[ "$JUMP_TO" != "" ]]; then
-    set -x
-    $TARGET_CMD "$JUMP_TO"
-    set +x
+    xsel -b <<<$JUMP_TO
+    echo "$JUMP_TO"
+    if [ -n "$X11_MODIFIER" -a -n "$DISPLAY" ]; then
+      xdotool type "$TARGET_CMD ${JUMP_TO@Q}"
+      xdotool key Enter
+    else
+      $TARGET_CMD "$JUMP_TO"
+    fi
   fi
 }
