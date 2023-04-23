@@ -22,25 +22,25 @@ set -o nounset                                  # Treat unset variables as an er
 `msh src lib/pkb`
 `msh src lib/x11`
 
-CAP_URLS_FILE="$PKB/captured/urls"
-CAP_DATA_DIR="$PKB/captured/data"
-CAP_SCRATCH_FILE="$PKB/CAPTURE.md"
+CAP_BASE=${CAPTURE_BASE:-$PKB/captured}
+CAP_TYPE=${CAPTURE_TYPE:-data}
+CAP_SCRATCH_FILE="$CAP_BASE/capture.md"
+CAP_TARGET_DIR="$CAP_BASE/$CAP_TYPE"
+CAP_URLS_FILE="$CAP_BASE/urls"
+
+T=${1:-}
+CAP_SINK="${CAP_SINK:-$CAP_TARGET_DIR/`basename "${T#*://}"`}"
+AS_MUSIC=${AS_MUSIC:-}
+TIMESTAMP=`date +%m%d-%H%M`
 
 # ensure directories exist
 if [ ! -f "$CAP_URLS_FILE" ]; then
   mkdir -p "$(dirname "$CAP_URLS_FILE")"
   touch "$CAP_URLS_FILE"
 fi
-if [ ! -d "$CAP_DATA_DIR" ]; then
-  mkdir -p "$CAP_DATA_DIR"
+if [ ! -d "$CAP_TARGET_DIR" ]; then
+  mkdir -p "$CAP_TARGET_DIR"
 fi
-
-T=${1:-}
-AS_MUSIC=${AS_MUSIC:-}
-ESTATUS=
-TIMESTAMP=`date +%m%d-%H%M`
-CAPTURED=
-
 # if run without a target, open the scratchpad
 if [ -z "$T" ]; then
   (
@@ -53,44 +53,53 @@ if [ -z "$T" ]; then
   exit 0
 fi
 
-if isytdl "$T"; then
+capture_web_url() {
+  local T="$1"
 
-  if [ -z "$AS_MUSIC" ]; then
-    pushd "$VIDEOS_DIR"
-    youtube-dl "$T" || youtube-dl -f best "$T"
-    ESTATUS=$?
-  else
-    pushd "$MUSIC_DIR"
-    youtube-dl-music "$T"
-    ESTATUS=$?
+  if isytdl "$T"; then
+    if [ -z "$AS_MUSIC" ]; then
+      pushd "$VIDEOS_DIR"
+      youtube-dl "$T" || youtube-dl -f best "$T" || return 1
+    else
+      pushd "$MUSIC_DIR"
+      youtube-dl-music "$T" || return 1
+    fi
+    # FIXME this real gets the "last created file in current dir"....
+    CAP_SINK="$(ls -1tc | head -n1)"
+    popd
+  else # not a youtube-dl url
+    read -p "cature title: " CAP_NAME
+    CAP_SINK="$CAP_TARGET_DIR/$TIMESTAMP"
+    mkdir -p "$CAP_SINK"
+    CAP_SINK="$CAP_SINK/$CAP_NAME"
+    monolith --no-fonts --no-frames "$T" -o "$CAP_SINK" || return 1
   fi
+}
 
-  if [ $ESTATUS -eq 0 ]; then
-    CAPTURED="$(realpath "$(ls -1tc | head -n1)")"
-    xsel -b <<< "$CAPTURED"
-    mpv --fs "$CAPTURED" &
-  else
-    echo Failed for "$T"
-    exit $ESTATUS
-  fi
-  popd
+set -e # exit on error
+case "$T" in
+  ssh://*|*@*:*) scp "$T" "$CAP_SINK";;
+  ftp://*) wget "$T" -O "$CAP_SINK";;
+  http?://*) capture_web_url "$1";;
+  *)
+    if [ -e "$T" ]; then
+      # if CAP_SINK is already a link, or doesn't exist, then force link
+      if [ -L "$CAP_SINK" -o ! -e "$CAP_SINK" ]; then
+        ln -sfn "$T" "$CAP_SINK"
+      else
+        echo "$CAP_SINK already exists"
+        exit 1
+      fi
+    else
+      echo Failed for "$T"
+      exit 1
+    fi
+esac
+set +e
 
-else # not a youtube-dl url
-  read -p "cature title: " CAP_NAME
-  CAPTURED="$CAP_DATA_DIR/$TIMESTAMP"
-  mkdir -p "$CAPTURED"
-  CAPTURED="$CAPTURED/$CAP_NAME"
-  monolith --no-fonts --no-frames "$T" -o "$CAPTURED"
-  CAPTURED="file://$CAPTURED"
-  ESTATUS=$?
-fi
-
-if [ ! -z "$CAPTURED" ]; then
-  echo "$CAPTURED" "$T" >> "$CAP_URLS_FILE"
-fi
-
-echo "$CAPTURED" | xclip -selection clipboard -i
-echo -e "\ncaptured $T to\n$CAPTURED"
+echo "$CAP_SINK" | xclip -selection clipboard -i
+echo "$CAP_SINK" "$T" >> "$CAP_URLS_FILE"
+echo -e "captured $CAP_SINK"
 
 # I want to know the original url of a file easily
 # I want to search through URLs I have saved
