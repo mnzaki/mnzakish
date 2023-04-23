@@ -5,7 +5,7 @@ lastfile() {
 }
 
 lnlastfile() {
-  ln -s "$1/$(lastfile "$1")"
+  ln -sr "$(lastfile "$1")"
 }
 
 set -x
