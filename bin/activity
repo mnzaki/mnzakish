@@ -160,6 +160,28 @@ _msh_activity_rofi() {
   _msh_activity_station_run $COMMAND
 }
 
+_msh_activity_ls() {
+  _msh_activity__load_from_disk
+  echo "${ACTIVITIES[*]}"
+}
+
+# capture a link or a path into the current activity
+_msh_activity_capture() {
+  CAPTURE_TYPE=notes CAPTURE_BASE="$ACTIVITY_DIR" capture "$1"
+}
+
+# run pomodoro and capture stdout in a coprocess
+_msh_activity_pomodoro() {
+  pomodoro | tee >(
+    while read -r line; do
+      case "$line" in
+        \#\#*Pomodoro*)
+          _msh_activity_capture "`pomodoro -t`"
+      esac
+    done
+  )
+}
+
 ##
 #### Main
 ##
@@ -171,7 +193,6 @@ while getopts "ps:" OPT; do
 done
 shift $((OPTIND-1))
 
-_msh_activity_load_from_disk
 if [ ${#ACTIVITIES} -eq 0 ]; then
   echo no activity
   exit 1
