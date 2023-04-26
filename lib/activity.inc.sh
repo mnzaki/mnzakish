@@ -17,18 +17,13 @@
 #      REVISION:  ---
 #===============================================================================
 
-`msh src lib/pkb`
-
 ACTIVITIES_DIR="$PKB/activity"
-CACHE_DIR="$MSH_CACHE/activity"
-mkdir -p "$ACTIVITIES_DIR" "$CACHE_DIR"
+mkdir -p "$ACTIVITIES_DIR"
 ACTIVITY=${ACTIVITY:-}
 
 _msh_activity__set() {
   ACTIVITY="${1}"
   _msh_activity__vars
-
-  [ ! -d "$ACTIVITY_CACHE_DIR" ] && mkdir -p "$ACTIVITY_CACHE_DIR"
 
   # ensure activity dir exists and is initialized
   if [ -d "$ACTIVITY_DIR" ]; then
@@ -59,9 +54,9 @@ _msh_activity__set() {
 }
 
 _msh_activity__vars() {
+  ACTIVITY=${ACTIVITY:-act1}
   ACTIVITY_SLUG=${ACTIVITY// /-}
   ACTIVITY_DIR="$ACTIVITIES_DIR/$ACTIVITY"
-  ACTIVITY_CACHE_DIR="$CACHE_DIR/$ACTIVITY"
   #_msh_fsdb_pvar ACTIVITY_WM_IDX "$ACTIVITY_DIR/wm_idx"
 }
 

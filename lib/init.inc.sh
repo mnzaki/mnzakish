@@ -27,6 +27,8 @@ export MSH_CACHE=${MSH_CACHE:-"$HOME/.cache/msh"}
 export MSH_LOCAL=${MSH_LOCAL:-"$HOME/.local/share/msh"}
 
 source "$MSH_DIR/lib/util.inc.sh"
+source "$MSH_DIR/lib/color.inc.sh"
+source "$MSH_DIR/lib/pkb.inc.sh"
 
 # ensure dirs exist
 mkdir -p "$MSH_CONFIG" "$MSH_CACHE" "$MSH_LOCAL"

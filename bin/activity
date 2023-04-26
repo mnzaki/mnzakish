@@ -20,8 +20,8 @@
 set -o nounset                                  # Treat unset variables as an error
 
 `msh src lib/pkb`
-`msh src lib/x11`
 `msh src lib/fsdb`
+`msh src lib/x11`
 `msh src lib/activity`
 
 _msh_choose_or_create() {

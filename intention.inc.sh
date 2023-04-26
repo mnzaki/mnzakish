@@ -17,20 +17,29 @@
 #      REVISION:  ---
 #===============================================================================
 
+`msh src lib/activity`
+
 if [ "$0" = "$BASH_SOURCE" ]; then
   echo "You are trying to directly invoke intention."
   echo "Intention must be sourced."
   exit 1
 fi
 
-#set -o nounset                                  # Treat unset variables as an error
+# TODO intention stack stored in FILE
+#      per tmux session if $TMUX
+#      reload from disk if changed since last load
+#      reload from disk before applying any changed
+#      write to disk on change
+#      load from disk on source-ing
 
 STACK_CHAR="${STACK_CHAR:-|}"
 # NOTE: INTENTIONS are listed in chronological order
 declare -A INTENTIONS
 INTENTIONS_DONE=("${INTENTIONS_DONE[@]}")
 
-PS1_ADDITION='\[[38;5;7m\]\[[38;1;7m\]$(printdirstack)'
+# TODO make it colorful and zsh compatible
+#PS1_ADDITION='\[[38;5;7m[38;1;7m\]$(printdirstack)'
+PS1_ADDTION='$(printdirstack)'
 PS1="${PS1/"$PS1_ADDITION"/}"
 export PS1="$PS1_ADDITION""$PS1"
 
