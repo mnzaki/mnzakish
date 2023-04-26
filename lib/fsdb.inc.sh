@@ -5,7 +5,7 @@
 #
 #         USAGE: source ./fsdb.inc.sh
 #
-#   DESCRIPTION: 
+#   DESCRIPTION:
 #
 #       OPTIONS: ---
 #  REQUIREMENTS: ed
@@ -63,51 +63,29 @@ _msh_fsdb_LIF_set() {
   echo -e "$ED_CMD\n.\nw" | ed -s "$1"
 }
 
-
-declare -g _MSH_PVAR_STORE="/tmp/$$/"
-_msh_fsdb_pvar_set_store() {
-  _MSH_PVAR_STORE="$1"
-}
-
-# Persistent Variables backed by files
-# - `pvar STUFF $PKB/msh/stuff` to register a var
+# Persistent VARiables backed by files
+# - `pvar STUFF $PKB/msh/stuff.inc.sh` to register a var and load from disk
 # - `STUFF+="bla"`
-# - `pvar STUFF` to sync value between mem and disk
-#     - from mem if not changed since `__pvar_STUFF_mtime`
-#     - otherwise from disk
+# - `pvar STUFF` to write value to disk
+# - `pvar STUFF =` to re-read value from disk
 _msh_fsdb_pvar() {
   local VAR_NAME="$1" VAR_FILE="$2"
   local VAR_FILE_VAR_NAME="__pvar_${VAR_NAME}_file"
-  local LAST_MTIME_VAR_NAME="__pvar_${VAR_NAME}_mtime"
 
-  if [ -n "$VAR_FILE" ]; then
-    # second argument specified so register $VAR_NAME with $VAR_FILE
-    if [ -n "$VAR_FILE_VAR_NAME" ]; then
-      # this variable was registered before, so let's clear that first
-      # to avoid bugs when reusing vars in different contexts
-      declare -g $LAST_MTIME_VAR_NAME=
-    fi
-    declare -g "$VAR_FILE_VAR_NAME"="$VAR_FILE"
-  else
+  if [ "$VAR_FILE" = '=' ]; then
     VAR_FILE="${!VAR_FILE_VAR_NAME}"
   fi
 
-  if [ ! -f "$VAR_FILE" ]; then
-    # if file doesn't exist then just create it and exit
-    echo "${!VAR_NAME@A}" > "$VAR_FILE"
-    MTIME="$(stat -c %Y "$VAR_FILE")"
-    declare -g "$LAST_MTIME_VAR_NAME"="$MTIME"
-    return
-  fi
-
-  local LAST_MTIME="${!LAST_MTIME_VAR_NAME}"
-  local MTIME="$(stat -c %Y "$VAR_FILE")"
-
-  # synchronize value of var between mem and file
-  if [[ -z "$LAST_MTIME" || $MTIME -gt $LAST_MTIME ]]; then
-    declare -g "$LAST_MTIME_VAR_NAME"="$MTIME" 
-    source <(sed 's/^declare/declare -g/' < $VAR_FILE)
+  if [ -z "$VAR_FILE" ]; then
+    # second argument not specified so write to disk
+    VAR_FILE="${!VAR_FILE_VAR_NAME}"
+    [ -z "$VAR_FILE" ] && return 1
+    local VAL_DEC="$(declare -p "$VAR_NAME")"
+    echo ${VAL_DEC/declare/declare -g} > "$VAR_FILE"
   else
-    echo "${!VAR_NAME@A}" > "$VAR_FILE"
+    # second argument specified so register $VAR_NAME with $VAR_FILE
+    # read from disk
+    declare -g "$VAR_FILE_VAR_NAME"="$VAR_FILE"
+    source "$VAR_FILE"
   fi
 }
