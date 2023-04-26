@@ -25,8 +25,11 @@ MSH_BASE=${MSH_BASE:-$MY_BASE}
 export MSH_DIR="$MSH_BASE"
 source "$MSH_DIR/lib/init.inc.sh"
 
-if ! grep -q "$MSH_BASE" "$HOME/.bashrc"; then
-  echo -e 'export PATH="'"$MSH_BASE/bin"':$PATH"\n$(msh bashrc)' >> "$HOME/.bashrc"
+if ! which "$(basename "$0")" &>/dev/null; then
+  if [ -f "$HOME/.bashrc" ]; then
+    echo -e 'export PATH="'"$MSH_BASE/bin"':$PATH"\n$(msh bashrc)' >> "$HOME/.bashrc"
+    export PATH="$MSH_BASE/bin:$PATH"
+  fi
 fi
 
 case "$1" in
