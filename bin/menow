@@ -1,39 +1,10 @@
 #!/bin/bash
 
-# extended globbing for TIMESTAMP matching support
-shopt -s extglob
+`msh src lib/activity`
+
+shopt -s extglob # extended globbing for double stars **
+
 ME=~/pkb/me
-
-# NOTE: if format is changed remember to change
-#       the POSSIBLY_FILE trimming below
-TIMESTAMP=`date +%m%d-%H%M`
-FILE_EXT=".md"
-TITLE="$@"
-
-# If the first argument is a pre-existing file
-POSSIBLY_FILE="$(realpath --relative-to . "$1")"
-if [[ -f "$POSSIBLY_FILE" ]]; then
-  # we use that file as the title
-  TITLE="$(basename "$POSSIBLY_FILE")"
-  # trim a prepended TIMESTAMP if there is any
-  TITLE="${TITLE#*+([0-9])-+([0-9])_}"
-  POSSIBLY_FILE="previously: file://./$POSSIBLY_FILE"
-else
-  POSSIBLY_FILE=""
-fi
-
-TITLE=${TITLE//[ ]/_}
-if [[ "$TITLE" != "" ]]; then
-  TITLE="_$TITLE"
-  PREVIOUS_MENOW=($ME/**/*${TITLE}${FILE_EXT})
-fi
-
-if [ -f "$PREVIOUS_MENOW" ]; then
-  echo "## [" `date +%T` "]" >> "$PREVIOUS_MENOW"
-  exec $EDITOR "$PREVIOUS_MENOW"
-fi
-
-
 # Check that `now` exists
 pushd $ME
 NOW=$(date +%Y)
@@ -45,10 +16,47 @@ fi
 MENOW="$ME/now"
 popd
 
-FULL_FILE_PATH="$MENOW/${TIMESTAMP}$TITLE$FILE_EXT"
+if [ $# -eq 0 ]; then
+  cd "$ME/now"
+  exec fzf --bind="enter:execute:menow {}"
+fi
+
+# If the first argument is a pre-existing file
+POSSIBLY_FILE="$(realpath --relative-to . "$1")"
+if [[ -f "$POSSIBLY_FILE" ]]; then
+  # we use that file as the title
+  TITLE="$(basename "$POSSIBLY_FILE")"
+  # trim a prepended TIMESTAMP if there is any
+  TITLE="${TITLE#*+([0-9])-+([0-9])_}"
+  TITLE="${TITLE%.md}"
+else
+  TITLE="$@"
+  TITLE=${TITLE//[ ]/_}
+fi
+
+if [ -n "$TITLE" ]; then
+  TITLE="_$TITLE"
+fi
+
+# NOTE: update TITLE trimming if you change the date format
+TIMESTAMP=`date +%m%d-%H%M`
+FILE_EXT=".md"
+
+if [[ "$TITLE" != "" ]]; then
+  PREVIOUS_ENTRY=($ME/**/*${TITLE}${FILE_EXT})
+fi
+
+FILE_NAME="$TIMESTAMP$TITLE$FILE_EXT"
+FULL_FILE_PATH="$MENOW/$FILE_NAME"
+
+if [ -f "$PREVIOUS_ENTRY" ]; then
+  ln -s "$PREVIOUS_ENTRY" "$FULL_FILE_PATH"
+fi
 
 case `basename "$0"` in
   menow)
+    # TODO parse @ and + from command and vim-wiki tag people and things
+    echo "## [" `date +%F\ %T` "]" >> "$FULL_FILE_PATH"
     ;;
   todayi)
     FULL_FILE_PATH="$MENOW/`date +%m%d`_today_I$FILE_EXT"
@@ -65,6 +73,8 @@ case `basename "$0"` in
 esac
 
 set -x
-# we echo this at the top of the file, as a reference to the previous file
-[ -n "$POSSIBLY_FILE" ] && echo "$POSSIBLY_FILE" >> "$FULL_FILE_PATH"
+
+# link the note with the current activity
+[ -n "$ACTIVITY_DIR" ] && ln -s "$ACTIVITY_DIR/notes/$FILE_NAME" "$FULL_FILE_PATH"
+
 exec $EDITOR "$FULL_FILE_PATH"
