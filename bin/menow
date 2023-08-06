@@ -75,6 +75,6 @@ esac
 set -x
 
 # link the note with the current activity
-[ -n "$ACTIVITY_DIR" ] && ln -s "$ACTIVITY_DIR/notes/$FILE_NAME" "$FULL_FILE_PATH"
+[ -n "$ACTIVITY_DIR" ] && ln -s "$FULL_FILE_PATH" "$ACTIVITY_DIR/notes/$FILE_NAME"
 
 exec $EDITOR "$FULL_FILE_PATH"
