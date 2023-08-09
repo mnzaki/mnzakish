@@ -1,24 +1,15 @@
 #!/bin/bash
 
+`msh src lib/pkb`
 `msh src lib/activity`
 
 shopt -s extglob # extended globbing for double stars **
 
-ME=~/pkb/me
-# Check that `now` exists
-pushd $ME
-NOW=$(date +%Y)
-if ! ls -l now | grep -q $NOW; then
-  # and link it if it doesn't
-  mkdir -p "$NOW"
-  ln -srf $NOW now
-fi
 MENOW="$ME/now"
-popd
 
 if [ $# -eq 0 ]; then
   cd "$ME/now"
-  exec fzf --bind="enter:execute:menow {}"
+  exec fzf --bind="enter:execute:if [ -n \"{}\" ]; then echo menow '{}'; else echo menow '{q}'; fi"
 fi
 
 # If the first argument is a pre-existing file
@@ -48,6 +39,8 @@ fi
 
 FILE_NAME="$TIMESTAMP$TITLE$FILE_EXT"
 FULL_FILE_PATH="$MENOW/$FILE_NAME"
+
+set -x
 
 if [ -f "$PREVIOUS_ENTRY" ]; then
   ln -s "$PREVIOUS_ENTRY" "$FULL_FILE_PATH"
