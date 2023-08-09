@@ -18,7 +18,18 @@
 #===============================================================================
 
 PKB="${PKB:-$HOME/pkb}"
-VIDEOS_DIR="$HOME/Videos"
-MUSIC_DIR="$HOME/Musik"
+VIDEOS="$(xdg-user-dir VIDEOS || echo "$HOME/Videos")"
+MUSIC="$(xdg-user-dir MUSIC || echo "$HOME/Music")"
+RECORDINGS="$(xdg-user-dir RECORDINGS || echo "$HOME/recordings")"
+ME="$PKB/me"
 
-# TODO: initialize the years subfolders and the "$*_DIR/now" link
+# Check that `now` exists
+#pushd $ME
+#echo there
+#NOW=$(date +%Y)
+#if ! ls -l now | grep -q $NOW; then
+#  # and link it if it doesn't
+#  mkdir -p "$NOW"
+#  ln -srf $NOW now
+#fi
+#popd

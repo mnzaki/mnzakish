@@ -17,6 +17,7 @@
 #      REVISION:  ---
 #===============================================================================
 
+`msh src lib/pkb`
 `msh src lib/activity`
 
 if [ "$0" = "$BASH_SOURCE" ]; then
