@@ -38,7 +38,7 @@ _msh_gen_bindings() {
 }
 
 _msh_awesomewm_bind() {
-  _msh_gen_bindings wm_$1 ${2:-0} "awesome-client \"require('extra').workspace_groups.$1(FNARGS)\""
+  _msh_gen_bindings wm_$1 ${2:-0} "awesome-client \"require('extra').wsg.$1(FNARGS)\""
 }
 
 _msh_awesomewm_bind get_current_group_idx
