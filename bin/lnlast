@@ -1,11 +1,11 @@
 #!/bin/sh
 
 lastfile() {
-  realpath `ls -1t "$1" | head -n 1`
+  realpath $1/`ls -1t "$1" | head -n 1`
 }
 
 lnlastfile() {
-  ln -sr "$(lastfile "$1")"
+  ln -s "$(lastfile "$1")"
 }
 
 set -x
