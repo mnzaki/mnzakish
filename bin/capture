@@ -57,12 +57,12 @@ capture_web_url() {
   local T="$1"
 
   if isytdl "$T"; then
-    if [ -z "$AS_MUSIC" ]; then
-      pushd "$VIDEOS_DIR"
-      youtube-dl "$T" || youtube-dl -f best "$T" || return 1
-    else
-      pushd "$MUSIC_DIR"
+    if [ -n "$AS_MUSIC" ]; then
+      pushd "$MUSIC"
       youtube-dl-music "$T" || return 1
+    else
+      pushd "$VIDEOS"
+      youtube-dl "$T" || youtube-dl -f best "$T" || return 1
     fi
     # FIXME this real gets the "last created file in current dir"....
     CAP_SINK="$(ls -1tc | head -n1)"
