@@ -215,6 +215,6 @@ fi
 PROCESS_NAME="#$ACTIVITY_SLUG"
 
 # this updates the name visible through pgrep
-echo "$PROCESS_NAME" > /proc/$$/comm
+echo -n "$PROCESS_NAME" > /proc/$$/comm
 exec -a "$PROCESS_NAME"
 $COMMAND "$@"

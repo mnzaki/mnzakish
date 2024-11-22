@@ -74,7 +74,7 @@ fi
 
 # if we don't already have a session
 if ! tmux has-session -t "$session"; then
-    # start a session in the backgroun
+    # start a session in the background
     tmux new-session -d -s "$session" $SESSION_ACTIVITY_DIR
     # try to tmux-resurrect it
     ~/.tmux/plugins/tmux-resurrect/scripts/restore.sh "$session"
