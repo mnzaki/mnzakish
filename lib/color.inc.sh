@@ -18,7 +18,7 @@
 #===============================================================================
 
 msh_colored() {
-  local BG_T=49
+  local BG_T=49 # RESET/Transparent
 
   if [ ${#@} -eq 0 ]; then
     echo -ne "\e[0;${BG_T}m"

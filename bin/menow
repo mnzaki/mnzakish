@@ -5,7 +5,7 @@
 
 shopt -s extglob # extended globbing for double stars **
 
-MENOW="$ME/now"
+MENOW=`realpath "$ME/now"`
 
 if [ $# -eq 0 ]; then
   cd "$ME/now"
