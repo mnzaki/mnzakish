@@ -55,7 +55,7 @@ msh_colored_rgb() {
   if [ "$MSG" != "" ]; then
     MSG+="\e[0m"
   fi
-  echo -ne "\e[38;$R;$G;$B;255m${MSG}"
+  echo -ne "\e[38;2;$R;$G;$B;255m${MSG}"
 }
 
 msh_colored_rgba() {
@@ -65,5 +65,5 @@ msh_colored_rgba() {
   if [ "$MSG" != "" ]; then
     MSG+="\e[0m"
   fi
-  echo -ne "\e[38;$R;$G;$B;$Am${MSG}"
+  echo -ne "\e[38;2;$R;$G;$B;${A}m${MSG}"
 }
