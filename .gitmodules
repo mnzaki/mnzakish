@@ -1,0 +1,3 @@
+[submodule "vendor/complete-alias"]
+	path = vendor/complete-alias
+	url = git@github.com:cykerway/complete-alias.git
