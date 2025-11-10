@@ -11,7 +11,7 @@
 #  REQUIREMENTS: ---
 #          BUGS: ---
 #         NOTES: ---
-#        AUTHOR: YOUR NAME (),
+#        AUTHOR: Mina Nagy Zaki <mnzaki@gmail.com>
 #  ORGANIZATION:
 #       CREATED: 24.06.2021 23:13:05
 #      REVISION:  ---
