@@ -1,0 +1,29 @@
+#!/bin/bash
+
+DIM_TIMEOUT_SEC=20
+DISPLAY_OFF_TIMEOUT_SEC=5
+LOCK_TIMEOUT_SEC=30
+
+SOCKET_PATH=~/.xidlehook.sock
+if [ "$1" = "--xinit" ]; then
+  export PREV_BRIGHTNESS_FILE=/tmp/.prev-brightness
+  # Run xidlehook
+  #--not-when-audio \
+  exec xidlehook \
+    --socket $SOCKET_PATH \
+    --not-when-fullscreen \
+    `# Dim screen, undim on activity` \
+    --timer $DIM_TIMEOUT_SEC \
+      'brightnessctl g > $PREV_BRIGHTNESS_FILE; brightnessctl s 0' \
+      'brightnessctl s $(cat $PREV_BRIGHTNESS_FILE)' \
+    `# undim and turn off screen after timout more seconds` \
+    --timer $DISPLAY_OFF_TIMEOUT_SEC \
+      'brightnessctl s $(cat $PREV_BRIGHTNESS_FILE); xset dpms force off' \
+      '' \
+    `# lock after even more time` \
+    --timer $LOCK_TIMEOUT_SEC \
+      'SLOCK=`pgrep slock`; if [ -n "$SLOCK" ]; then waitpid $SLOCK; else slock; fi' \
+      ''
+fi
+
+exec slock
