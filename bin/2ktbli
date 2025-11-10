@@ -1,0 +1,68 @@
+#!/bin/bash -
+#===============================================================================
+#
+#          FILE: fos7a.sh
+#
+#         USAGE: ./fos7a.sh
+#
+#   DESCRIPTION:
+#
+#       OPTIONS: ---
+#  REQUIREMENTS: ---
+#          BUGS: ---
+#         NOTES: ---
+#        AUTHOR: Mina Nagy Zaki <mnzaki@gmail.com>
+#  ORGANIZATION:
+#       CREATED: 09.07.2021 11:59:08
+#      REVISION:  ---
+#===============================================================================
+
+set -o nounset                                  # Treat unset variables as an error
+# input proper franco
+# get back proper fos7a
+
+ABGADEYYA=(
+ 'أ' 'ا' 'إ' 'ب' 'ت' 'ث'  'ج' 'ح' 'خ' 'د' 'ذ' 'ر' 'ز' 'س' 'ش'  'ص' 'ض' 'ط' 'ظ'  'ع'  'غ' 'ف' 'ق' 'ك' 'ل' 'م' 'ن' 'ه' 'و' 'ي' '؟' '!'
+)
+ALPHABETS=(
+ 'A' 'a' 'e' 'b' 't' 'th' 'g' '7' '5' 'd' 'z' 'r' \;  's' 'sh' 'S' 'D' 'T' 'Z' '3' "gh" 'f' 'q' 'k' 'l' 'm' 'n' 'h' 'w' 'y' '\?' '!'
+)
+
+EXTRA_FUN=(
+ ''  ''  ''  ''  ''   ''  ''  ''  ''  ''  ''  ',' ''  ''  ''   ''  ''  '6' "6'" '' "'3" ''  ''  ''  ''  ''  ''  ''  ''  ''   ''  ''
+)
+
+SED_SCRIPT_SINGLE='s/i/ي/g; s/o/و/g;'
+SED_SCRIPT_DOUBLE=''
+
+ABGD_IDX=0
+for A in "${ALPHABETS[@]}"; do
+  ABGD="${ABGADEYYA[$ABGD_IDX]}"
+  EXTRA="${EXTRA_FUN[$ABGD_IDX]}"
+
+  if [ `echo -n $A | wc -c` = "1" ]; then
+    SED_SCRIPT_SINGLE="${SED_SCRIPT_SINGLE} s/$A/$ABGD/g;"
+  else
+    SED_SCRIPT_DOUBLE="${SED_SCRIPT_DOUBLE} s/$A/$ABGD/g;"
+  fi
+
+  if [ -n "$EXTRA" ]; then
+    if [ `echo -n $EXTRA | wc -c` = "1" ]; then
+      SED_SCRIPT_SINGLE="${SED_SCRIPT_SINGLE} s/$EXTRA/$ABGD/g;"
+    else
+      SED_SCRIPT_DOUBLE="${SED_SCRIPT_DOUBLE} s/$EXTRA/$ABGD/g;"
+    fi
+  fi
+
+  ABGD_IDX=$((ABGD_IDX + 1))
+done
+
+echo "$SED_SCRIPT_DOUBLE $SED_SCRIPT_SINGLE"
+OUTPUT=$(dmenu 0<&- | perl -CSDA -e '
+use utf8; binmode(STDOUT, ":utf8");
+while(<>) {
+  chomp;
+'"$SED_SCRIPT_DOUBLE $SED_SCRIPT_SINGLE"'
+  print "$_\n";
+}')
+xdotool type "$OUTPUT"
