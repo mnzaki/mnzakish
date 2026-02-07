@@ -1,0 +1,34 @@
+#!/bin/bash -
+#===============================================================================
+#
+#          FILE: syncup.sh
+#
+#         USAGE: ./syncup.sh
+#
+#   DESCRIPTION:
+#
+#       OPTIONS: ---
+#  REQUIREMENTS: ---
+#          BUGS: ---
+#         NOTES: ---
+#        AUTHOR: YOUR NAME (),
+#  ORGANIZATION:
+#       CREATED: 09.08.2021 22:49:48
+#      REVISION:  ---
+#===============================================================================
+
+syncup() {
+  local BASE="$(git rev-parse --show-toplevel)"
+  local DEST="$(git remote get-url origin)"
+  local WHATtoSYNCabout="${@:-.}"
+  WHATtoSYNCabout="$(realpath "$WHATtoSYNCabout" --relative-to="$BASE")"
+
+  pushd $BASE
+  rsync -HRravE --progress --exclude="*mkv" "$WHATtoSYNCabout" "$DEST"
+  popd
+}
+
+if [ "$0" = "$BASH_SOURCE" ]; then
+  # direct invocation
+  syncup "$@"
+fi

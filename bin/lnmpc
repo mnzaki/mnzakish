@@ -1,0 +1,12 @@
+#!/bin/bash
+MPC="mpc -h boopity@localhost"
+MPC_CURRENT="$($MPC -f "%file%" current)"
+if [ $? -ne 0 ] || [ -z "$MPC_CURRENT" ]; then
+  echo nothing playing
+  exit 1
+fi
+FILE_PATH="$HOME/Musik/$MPC_CURRENT"
+
+echo "$FILE_PATH" | xsel -b
+echo "$FILE_PATH"
+exec ln "$FILE_PATH" "$@"

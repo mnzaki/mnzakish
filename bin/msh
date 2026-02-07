@@ -1,0 +1,78 @@
+#!/bin/bash -
+#===============================================================================
+#
+#          FILE: m.sh
+#
+#         USAGE: ./m.sh
+#
+#   DESCRIPTION:
+#
+#       OPTIONS: ---
+#  REQUIREMENTS: ---
+#          BUGS: ---
+#         NOTES: ---
+#        AUTHOR: Mina Nagy Zaki (mnzaki), mnzaki@gmail.com
+#  ORGANIZATION: mnzaki.com
+#       CREATED: 08.07.2022 17:18:45
+#      REVISION:  ---
+#===============================================================================
+
+#set -o nounset                                  # Treat unset variables as an error
+
+MY_BASE="$( cd "$( dirname "$(realpath "${BASH_SOURCE[0]}")")/.." >/dev/null && pwd )"
+MSH_BASE=${MSH_BASE:-$MY_BASE}
+# TODO make it so it can be installed elsewhere
+export MSH_DIR="$MSH_BASE"
+source "$MSH_DIR/lib/init.inc.sh"
+
+if ! which "$(basename "$0")" &>/dev/null; then
+  if [ -f "$HOME/.bashrc" ]; then
+    echo -e 'export PATH="'"$MSH_BASE/bin"':$PATH"\n$(msh bashrc)' >> "$HOME/.bashrc"
+    export PATH="$MSH_BASE/bin:$PATH"
+  fi
+fi
+
+case "$1" in
+  '') echo "msh usage";;
+  dir) echo $MSH_DIR;;
+  src) echo "source $MSH_DIR/$2.inc.sh";;
+  lib) echo $MSH_DIR/lib/$2.inc.sh;;
+  conf) echo $HOME_MSH/conf.inc.sh;;
+  bashrc)
+    echo source $MSH_DIR/bashrc
+  ;;
+  *)
+    #debug echo args "$@"
+    if [ "$1" = "debug" ]; then
+      export DEBUG=$1
+      shift
+    fi
+
+    MSH_LIB="$MSH_DIR/lib/$1.inc.sh"
+
+    if [ -f "$MSH_LIB" ]; then
+      SOURCE_FILE="$MSH_LIB"
+      MSH_CMD="_msh_${2}"
+    else
+      SOURCE_FILE="$(which "$1")"
+      MSH_CMD="$2"
+    fi
+
+
+    if [ "$SOURCE_FILE" == "$MSH_LIB" ]; then
+      #debug echo -e "MSH_LIB $MSH_LIB \n MSH_CMD $MSH_CMD"
+      shift 2
+      if [ "$DEBUG" ]; then
+        SOURCE_FILE_DEBUG=`mktemp`
+        sed 's/#debug //' < "$SOURCE_FILE" > "$SOURCE_FILE_DEBUG"
+        source "$SOURCE_FILE_DEBUG"
+        rm "$SOURCE_FILE_DEBUG"
+      else
+        source "$SOURCE_FILE"
+      fi
+    else
+      # we have done nothing useful
+      exec "$@"
+    fi
+  ;;
+esac

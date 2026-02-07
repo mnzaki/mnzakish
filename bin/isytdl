@@ -1,0 +1,23 @@
+#!/bin/env python3
+
+import youtube_dl
+import sys
+
+def is_supported(url):
+    extractors = youtube_dl.extractor.gen_extractors()
+    for e in extractors:
+        if e.suitable(url) and e.IE_NAME != 'generic':
+            return True
+    return False
+
+try:
+    url = sys.argv[1]
+except:
+    print("Usage:\nisytdl <URL")
+    sys.exit(1)
+
+if is_supported(url):
+    print("youtube-dl compatible: " + url)
+else:
+    print("not youtube-dl compatible: " + url)
+    sys.exit(1)

@@ -1,9 +1,9 @@
 #!/bin/bash
 #===============================================================================
 #
-#          FILE: concentration.sh
+#          FILE: concentration.inc.sh
 #
-#         USAGE: source ./concentration.sh
+#         USAGE: source ./concentration.inc.sh
 #
 #   DESCRIPTION:
 #
@@ -26,7 +26,7 @@ fi
 #set -o nounset                                  # Treat unset variables as an error
 
 BASE="$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" &> /dev/null && pwd )"
-source "$BASE/intention.sh"
+source "$BASE/intention.inc.sh"
 
 CONCENTRATION_MANTRA=(
   conCENTRATE
@@ -70,6 +70,7 @@ AND_GROUNDS=
 
 function concentration {
   local EXIT_CODE=${1:-$?}
+  local BWhiteOnBlack='\e[1;37;40m' # Bold White
 
   if [ $EXIT_CODE -eq 130 ]; then # it was a Control-C
     # so increment the CCCCount
@@ -98,7 +99,9 @@ function concentration {
         echo concentrate
         while [ $CONCENTRATION_TIMES -lt $CCCCount ]; do
           local CONC_IDX=$(( (CONCENTRATION_TIMES+CONC_IDX_OFFSET) % NUM_MANTRAS))
-          echo ${CONCENTRATION_MANTRA[$CONC_IDX]}
+          local MANTRA=${CONCENTRATION_MANTRA[$CONC_IDX]}
+          local BOLDBIT=
+          echo -e ${MANTRA:0:$CONC_IDX}$BWhiteOnBlack${MANTRA:$CONC_IDX:3}'\e[0m'${MANTRA:$((CONC_IDX+3))}
           (( CONCENTRATION_TIMES++ ))
         done
       ) <(getintentions | head -n $((CCCCount-1)) )
@@ -113,6 +116,7 @@ function concentration {
   fi
 }
 
+PROMPT_COMMAND=${PROMPT_COMMAND:-}
 case "$PROMPT_COMMAND" in
   *concentration*)
     # Do stuff #

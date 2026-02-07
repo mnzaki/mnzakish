@@ -1,15 +1,19 @@
-BASE="$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" &> /dev/null && pwd )"
-
-source "$BASE/concentration.sh"
-source "$BASE/intention.sh"
-source "$BASE/space.sh"
-source "$BASE/time.sh"
-# source "$BASE/categorization.sh"
+# This file is meant to remain in the installation directory, and be sourced
+# from ~/.bashrc either directly or via `msh bashrc`
+export MSH_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+export PATH="$MSH_DIR/bin:$PATH"
 
 source "$BASE/vendor/complete-alias/complete_alias"
 
-export PATH="$BASE/bin:$PATH"
+source "$MSH_DIR/lib/init.inc.sh"
+source "$MSH_DIR/concentration.inc.sh"
+source "$MSH_DIR/intention.inc.sh"
+source "$MSH_DIR/navigation.inc.sh"
+source "$MSH_DIR/categorization.inc.sh"
+source "$MSH_DIR/space.sh"
+source "$MSH_DIR/time.sh"
+
 
 nodebin () {
-  export PATH="$PATH:`yarn bin`"
+  export PATH="$PATH:$(yarn bin)"
 }

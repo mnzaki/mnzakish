@@ -1,21 +1,91 @@
+# current messsh
+To "install":
+1. clone the repo somewhere
+3. Run `./mnzakish/bin/msh`
+  a. it will add `msh bashrc` to your bashrc and expand your `$PATH`
+
 # mnzakish
-`mnzakish`, or `msh` for short, is really just `bash` and some stuff over each other. _msh_ is pronounced like the Arabic "مِشّْ " or the German "mich", not like the English "mesh".
+`mnzakish`, or `msh` for short, is a framework of shell tools to manage and
+interact with a Personal Knowledge Base composed of markdown and media files.
 
-## Context / Stack Frame
-
-`msh` is `cwd`-<abbr title="Current Working Directory">aware</abbr>, and <a
-href="http://www.gnu.org/software/bash/manual/html_node/The-Directory-Stack.html#The-Directory-Stack">Directory Stack</a> aware, imbuing both with further function.
-
-For _msh_ each `StackFrame`, or _SF_ for short, accounts for an _Activity_ such as browsing a directory listing or finding a file, or editing a file. Activities are grouped by an _Intent_. Intents are higher level tasks, like things from your todo list or task manager for example.
-
-An _SF_ is a unit of attention attributable to an _Intent_. _msh_ is an intent manager at its core.
+_msh_ is pronounced like the Arabic "مِشّْ " or the German "mich", not like the
+English "mesh". Note that the German and Arabic pronounciation are not similar.
 
 
 
-## concentration.sh
+## Typical session
 
-Do not try to directly invoke concentration.sh, rather source it in your shell
-(or .bashrc):
+lets work on mnzakish
+first we j ump there
 ```
-source ~/.msh/concentration.sh
+j
+mnzakish
 ```
+
+and we notice we are on a higher platform now
+```
+echo $PS1
+```
+
+so we Set our Intention
+      s       i
+         s i
+```
+si document mnzakish a bit
+```
+
+`si` stands for "set intention"
+
+it's also helpful to remember to [s-e-e](https://youtu.be/LpVDbg0esHo?t=64)
+
+Did you know that "si" means
+["yes"](https://www.spanishdict.com/translate/s%C3%AD) in spanish?
+
+
+```
+yes document mnzakish a bit
+```
+
+
+Now you are distracted, but you remembered to `si`
+
+so just control; see.
+
+```
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+CTRL-C
+```
+

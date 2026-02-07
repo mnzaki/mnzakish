@@ -1,0 +1,48 @@
+#!/bin/sh
+
+lastfile() {
+  realpath $1/`ls -1t "$1" | head -n 1`
+}
+
+lnlastfile() {
+  ln -s "$(lastfile "$1")"
+}
+
+set -x
+case "$(basename "$0")" in
+  lnlastscreen)
+    lnlastfile ~/Images/screenshots
+    ;;
+  lnlastcast)
+    lnlastfile ~/Videos/screens/ 
+    ;;
+  lnlastcastp)
+    lnlastcast
+    mpvlastcast
+    ;;
+  lnlastnote)
+    lnlastfile ~/pkb/me/now 
+    ;;
+  lnlastpomo)
+    lnlastfile ~/pkb/pomodoro 
+    ;;
+  lnlastvis)
+    lnlastfile ~/Images/screenshots
+    lnlastfile ~/Videos/screens/ 
+    ;;
+  lnlastrec)
+    lnlastfile ~/recordings 
+    ;;
+  lnlast)
+    lnlastscreen
+    lnlastcast
+    lnlastnote
+    ;;
+  mpvlastcast)
+    mpvlowlat "$(lastfile ~/Videos/screens/)"
+    ;;
+  *)
+    echo "what do you want?"
+    cat $0
+    ;;
+esac

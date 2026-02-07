@@ -1,0 +1,106 @@
+#!/bin/bash -
+#===============================================================================
+#
+#          FILE: capture.sh
+#
+#         USAGE: ./capture.sh
+#
+#   DESCRIPTION:
+#
+#       OPTIONS: ---
+#  REQUIREMENTS: mnzakish monolith mpv python-youtube-dl
+#          BUGS: ---
+#         NOTES: ---
+#        AUTHOR: Mina Nagy Zaki (mnzaki), mnzaki@gmail.com
+#  ORGANIZATION: mnzaki.com
+#       CREATED: 09.08.2022 16:28:33
+#      REVISION:  ---
+#===============================================================================
+
+set -o nounset                                  # Treat unset variables as an error
+
+`msh src lib/pkb`
+`msh src lib/x11`
+
+CAP_BASE=${CAPTURE_BASE:-$PKB/captured}
+CAP_TYPE=${CAPTURE_TYPE:-data}
+CAP_SCRATCH_FILE="$CAP_BASE/capture.md"
+CAP_TARGET_DIR="$CAP_BASE/$CAP_TYPE"
+CAP_URLS_FILE="$CAP_BASE/urls"
+
+T=${1:-}
+CAP_SINK="${CAP_SINK:-$CAP_TARGET_DIR/`basename "${T#*://}"`}"
+AS_MUSIC=${AS_MUSIC:-}
+TIMESTAMP=`date +%m%d-%H%M`
+
+# ensure directories exist
+if [ ! -f "$CAP_URLS_FILE" ]; then
+  mkdir -p "$(dirname "$CAP_URLS_FILE")"
+  touch "$CAP_URLS_FILE"
+fi
+if [ ! -d "$CAP_TARGET_DIR" ]; then
+  mkdir -p "$CAP_TARGET_DIR"
+fi
+# if run without a target, open the scratchpad
+if [ -z "$T" ]; then
+  (
+    while read CAP_STDIN; do
+      echo -e "\n$CAP_STDIN\n" >> "$CAP_SCRATCH_FILE"
+    done
+  ) < /dev/stdin &
+
+  _msh_focus_or_exec $VISUAL $CAP_SCRATCH_FILE
+  exit 0
+fi
+
+capture_web_url() {
+  local T="$1"
+
+  if isytdl "$T"; then
+    if [ -n "$AS_MUSIC" ]; then
+      pushd "$MUSIC"
+      youtube-dl-music "$T" || return 1
+    else
+      pushd "$VIDEOS"
+      youtube-dl "$T" || youtube-dl -f best "$T" || return 1
+    fi
+    # FIXME this real gets the "last created file in current dir"....
+    CAP_SINK="$(ls -1tc | head -n1)"
+    popd
+  else # not a youtube-dl url
+    read -p "cature title: " CAP_NAME
+    CAP_SINK="$CAP_TARGET_DIR/$TIMESTAMP"
+    mkdir -p "$CAP_SINK"
+    CAP_SINK="$CAP_SINK/$CAP_NAME"
+    monolith --no-fonts --no-frames "$T" -o "$CAP_SINK" || return 1
+  fi
+}
+
+set -e # exit on error
+case "$T" in
+  ssh://*|*@*:*) scp "$T" "$CAP_SINK";;
+  ftp://*) wget "$T" -O "$CAP_SINK";;
+  http?://*) capture_web_url "$1";;
+  *)
+    if [ -e "$T" ]; then
+      # if CAP_SINK is already a link, or doesn't exist, then force link
+      if [ -L "$CAP_SINK" -o ! -e "$CAP_SINK" ]; then
+        ln -sfn "$T" "$CAP_SINK"
+      else
+        echo "$CAP_SINK already exists"
+        exit 1
+      fi
+    else
+      echo Failed for "$T"
+      exit 1
+    fi
+esac
+set +e
+
+echo "$CAP_SINK" | xclip -selection clipboard -i
+echo "$CAP_SINK" "$T" >> "$CAP_URLS_FILE"
+echo -e "captured $CAP_SINK"
+
+# I want to know the original url of a file easily
+# I want to search through URLs I have saved
+# I want to search through titles and descriptions

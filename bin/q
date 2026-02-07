@@ -1,0 +1,33 @@
+#!/bin/bash -
+#===============================================================================
+#
+#          FILE: q.sh
+#
+#         USAGE: ./q.sh
+#
+#   DESCRIPTION: queue a file in mpd
+#
+#       OPTIONS: ---
+#  REQUIREMENTS: ---
+#          BUGS: ---
+#         NOTES: ---
+#        AUTHOR: Mina Nagy Zaki (mnzaki), mnzaki@gmail.com
+#  ORGANIZATION: mnzaki.com
+#       CREATED: 07.12.2022 18:37:23
+#      REVISION:  ---
+#===============================================================================
+
+set -o nounset                                  # Treat unset variables as an error
+`msh src lib/pkb`
+`msh src lib/util`
+
+for FILE_ARG in "$(xclip -o)" "$(xclip -selection clipboard -o)" "$@"
+do
+  if [ -e "$FILE_ARG" ]; then
+    FILE_ARG="$(relpath "$FILE_ARG" "$MUSIC_DIR")"
+    mpc add "$FILE_ARG"
+    if ! mpc | grep -q "playing"; then
+      mpc play
+    fi
+  fi
+done

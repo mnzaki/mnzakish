@@ -1,0 +1,73 @@
+#!/bin/bash
+
+`msh src lib/pkb`
+`msh src lib/activity`
+
+shopt -s extglob # extended globbing for double stars **
+
+MENOW=`realpath "$ME/now"`
+
+if [ $# -eq 0 ]; then
+  cd "$ME/now"
+  exec fzf --bind="enter:execute:if [ -n \"{}\" ]; then echo menow '{}'; else echo menow '{q}'; fi"
+fi
+
+# If the first argument is a pre-existing file
+POSSIBLY_FILE="$(realpath --relative-to . "$1")"
+if [[ -f "$POSSIBLY_FILE" ]]; then
+  # we use that file as the title
+  TITLE="$(basename "$POSSIBLY_FILE")"
+  # trim a prepended TIMESTAMP if there is any
+  TITLE="${TITLE#*+([0-9])-+([0-9])_}"
+  TITLE="${TITLE%.md}"
+else
+  TITLE="$@"
+  TITLE=${TITLE//[ ]/_}
+fi
+
+if [ -n "$TITLE" ]; then
+  TITLE="_$TITLE"
+fi
+
+# NOTE: update TITLE trimming if you change the date format
+TIMESTAMP=`date +%m%d-%H%M`
+FILE_EXT=".md"
+
+if [[ "$TITLE" != "" ]]; then
+  PREVIOUS_ENTRY=($ME/**/*${TITLE}${FILE_EXT})
+fi
+
+FILE_NAME="$TIMESTAMP$TITLE$FILE_EXT"
+FULL_FILE_PATH="$MENOW/$FILE_NAME"
+
+set -x
+
+if [ -f "$PREVIOUS_ENTRY" ]; then
+  ln -s "$PREVIOUS_ENTRY" "$FULL_FILE_PATH"
+fi
+
+case `basename "$0"` in
+  menow)
+    # TODO parse @ and + from command and vim-wiki tag people and things
+    echo "## [" `date +%F\ %T` "]" >> "$FULL_FILE_PATH"
+    ;;
+  todayi)
+    FULL_FILE_PATH="$MENOW/`date +%m%d`_today_I$FILE_EXT"
+    set -x
+    echo "## [" `date +%T` "]" >> "$FULL_FILE_PATH"
+    if [ -n "$1" ]; then
+      echo "- $@" >> "$FULL_FILE_PATH"
+      exit 0
+    fi
+    ;;
+  herenow)
+    ln -s "$FULL_FILE_PATH" .
+    ;;
+esac
+
+set -x
+
+# link the note with the current activity
+[ -n "$ACTIVITY_DIR" ] && ln -s "$FULL_FILE_PATH" "$ACTIVITY_DIR/notes/$FILE_NAME"
+
+exec $EDITOR "$FULL_FILE_PATH"

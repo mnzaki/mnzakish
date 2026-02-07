@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -ex
+
+TUBE_LINK=${1}
+cd $HOME/Videos
+if youtube-dl "$TUBE_LINK"; then
+  mp --fs "`ls -1tc | head -n1`" &
+fi
