@@ -3,7 +3,7 @@
 export MSH_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 export PATH="$MSH_DIR/bin:$PATH"
 
-source "$BASE/vendor/complete-alias/complete_alias"
+source "$MSH_DIR/vendor/complete-alias/complete_alias"
 
 source "$MSH_DIR/lib/init.inc.sh"
 source "$MSH_DIR/concentration.inc.sh"

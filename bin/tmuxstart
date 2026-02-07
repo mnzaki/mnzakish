@@ -20,7 +20,8 @@ if ! tmux has-session -t "$SESSION_NAME"; then
   # if we don't already have a session start one in the background
   tmux new-session -d -s "$SESSION_NAME" $SESSION_ACTIVITY_DIR
   # and try to tmux-resurrect it
-  ~/.tmux/plugins/tmux-resurrect/scripts/restore.sh "$SESSION_NAME"
+  # FIXME need to read code that stores sessions per session name
+  # ~/.tmux/plugins/tmux-resurrect/scripts/restore.sh "$SESSION_NAME"
 fi
 
 if [ $# -ge 1 ]; then

@@ -38,3 +38,5 @@ mkdir -p "$MSH_CONFIG" "$MSH_CACHE" "$MSH_LOCAL"
 if [ ! -f "$MSH_CONFIG/conf.inc.sh" ]; then
   cp "$MSH_DIR/conf.inc.sh" "$MSH_CONFIG/conf.inc.sh"
 fi
+
+source "$MSH_CONFIG/conf.inc.sh"

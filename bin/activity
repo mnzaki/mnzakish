@@ -17,12 +17,14 @@
 #      REVISION:  ---
 #===============================================================================
 
-set -o nounset                                  # Treat unset variables as an error
+#set -o nounset                                  # Treat unset variables as an error
 
 `msh src lib/pkb`
 `msh src lib/fsdb`
 `msh src lib/x11`
 `msh src lib/activity`
+
+TERMINAL="${TERMINAL:-kitty}"
 
 _msh_choose_or_create() {
   local NEW_VAL CHOSEN
