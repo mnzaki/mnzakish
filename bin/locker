@@ -1,15 +1,15 @@
 #!/bin/bash
 
-DIM_TIMEOUT_SEC=20
+DIM_TIMEOUT_SEC=30
 DISPLAY_OFF_TIMEOUT_SEC=5
-LOCK_TIMEOUT_SEC=30
+LOCK_TIMEOUT_SEC=100
 
 SOCKET_PATH=~/.xidlehook.sock
 if [ "$1" = "--xinit" ]; then
   export PREV_BRIGHTNESS_FILE=/tmp/.prev-brightness
   # Run xidlehook
   #--not-when-audio \
-  exec xidlehook \
+  xidlehook \
     --socket $SOCKET_PATH \
     --not-when-fullscreen \
     `# Dim screen, undim on activity` \
@@ -24,6 +24,7 @@ if [ "$1" = "--xinit" ]; then
     --timer $LOCK_TIMEOUT_SEC \
       'SLOCK=`pgrep slock`; if [ -n "$SLOCK" ]; then waitpid $SLOCK; else slock; fi' \
       ''
+  exit
 fi
 
 exec slock
