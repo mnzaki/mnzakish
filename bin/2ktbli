@@ -32,8 +32,9 @@ EXTRA_FUN=(
  ''  ''  ''  ''  ''   ''  ''  ''  ''  ''  ''  ',' ''  ''  ''   ''  ''  '6' "6'" '' "'3" ''  ''  ''  ''  ''  ''  ''  ''  ''   ''  ''
 )
 
+# NOTE: sed scripts are run in perl!
 SED_SCRIPT_SINGLE='s/i/ي/g; s/o/و/g;'
-SED_SCRIPT_DOUBLE=''
+SED_SCRIPT_DOUBLE='s/aa/ى/g;'
 
 ABGD_IDX=0
 for A in "${ALPHABETS[@]}"; do
@@ -63,6 +64,6 @@ use utf8; binmode(STDOUT, ":utf8");
 while(<>) {
   chomp;
 '"$SED_SCRIPT_DOUBLE $SED_SCRIPT_SINGLE"'
-  print "$_\n";
+  print "\n$_";
 }')
 xdotool type "$OUTPUT"
