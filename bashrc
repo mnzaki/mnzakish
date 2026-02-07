@@ -2,6 +2,8 @@ BASE="$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" &> /dev/null && pwd )"
 
 source "$BASE/concentration.sh"
 source "$BASE/intention.sh"
+source "$BASE/space.sh"
+source "$BASE/time.sh"
 # source "$BASE/categorization.sh"
 
 source "$BASE/vendor/complete-alias/complete_alias"
