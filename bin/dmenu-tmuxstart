@@ -1,0 +1,13 @@
+#!/bin/sh
+
+`msh src lib/init`
+
+DMENU_CMD="dmenu"
+SESSION_NAME=$(tmuxstart -l | $DMENU_CMD -p tmuxstart);
+
+if [ $? -ne 0 ] || [ "$SESSION_NAME" = ""]; then
+  # dmenu was CTRL-Ced, or something
+  exit 1
+fi
+
+$TERMINAL tmuxstart $SESSION_NAME

@@ -60,8 +60,8 @@ _msh_activity__vars() {
   #_msh_fsdb_pvar ACTIVITY_WM_IDX "$ACTIVITY_DIR/wm_idx"
 }
 
-_msh_activity__load_from_disk() {
-  ACTIVITIES=($(command ls -1t "$ACTIVITIES_DIR"))
+_msh_activity__load_from_tmux() {
+  ACTIVITIES=($(tmux display-message -p "#{session_name}"))
   if [ ${#ACTIVITIES} -gt 0 ]; then
     ACTIVITY="${ACTIVITIES[0]}"
     _msh_activity__vars
@@ -71,5 +71,7 @@ _msh_activity__load_from_disk() {
 if [ -n "$ACTIVITY" ]; then
   _msh_activity__vars
 else # if we don't already have an environment
-  _msh_activity__load_from_disk
+  _msh_activity__load_from_tmux
 fi
+
+mkdir -p "$ACTIVITY_DIR"

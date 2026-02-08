@@ -24,8 +24,6 @@
 `msh src lib/x11`
 `msh src lib/activity`
 
-TERMINAL="${TERMINAL:-kitty}"
-
 _msh_choose_or_create() {
   local NEW_VAL CHOSEN
   declare -n ARR_VAR="$1"
@@ -126,7 +124,7 @@ _msh_activity_station() {
   _msh_focus_or_exec $TERMINAL tmuxstart ${ACTIVITY_SLUG}
 }
 
-_msh_activity_station_run() {
+_msh_activity_run() {
   tmuxstart "$ACTIVITY" "$@"
 }
 
@@ -207,9 +205,16 @@ if type -t $COMMAND &>/dev/null; then
   # subcommand
   shift
 else
-  # if there's no such command, then we assume the user provided a bin in $PATH
-  # and we use our station_run command
-  COMMAND="_msh_activity_station_run"
+  echo "unknown command: $COMMAND"
+  echo "Commands are:"
+  echo pick_or_create
+  echo station
+  echo station_run
+  echo rofi
+  echo ls
+  echo capture
+  echo pomodoro
+  exit 1
 fi
 
 # process name is the current activity so we can pgrep later
