@@ -121,6 +121,7 @@ _msh_activity_pick_or_create() {
 
 _msh_activity_station() {
   _msh_wm_view_group_by_purpose "$ACTIVITY_SLUG"
+  cd "$ACTIVITY_DIR"
   _msh_focus_or_exec $TERMINAL tmuxstart ${ACTIVITY_SLUG}
 }
 

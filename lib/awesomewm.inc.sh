@@ -38,7 +38,7 @@ _msh_gen_bindings() {
 }
 
 _msh_awesomewm_bind() {
-  _msh_gen_bindings wm_$1 ${2:-0} "awesome-client \"require('extra').wsg.$1(FNARGS)\""
+  _msh_gen_bindings wm_$1 ${2:-0} "awesome-client \"return require('attentive').$1(FNARGS)\" | head -n 1 | sed '"'s/\s*string "\(.*\)"/\1/'"'"
 }
 
 # generate _msh_wm_view_group_by_purpose etc
@@ -47,4 +47,4 @@ _msh_awesomewm_bind set_current_group_purpose 1
 
 _msh_awesomewm_bind get_current_group_idx
 _msh_awesomewm_bind get_free_group_idx
-_msh_awesomewm_bind get_current_group_purpose
+_msh_awesomewm_bind get_current_activity

@@ -1,7 +1,6 @@
 #!/bin/bash
 
 `msh src lib/init`
-`msh src lib/activity`
 
 if [ $# -lt 1 ]; then
   echo "Usage: $(basename $0) SESSION [COMMAND]"
@@ -16,15 +15,14 @@ fi
 
 # replace space with dash for easier string handling
 SESSION_NAME=${1// /-}
+# replace dots with underscores to not break tmux pane names
+SESSION_NAME=${SESSION_NAME//./_}
 shift
 
-if [ -n "$ACTIVITY_DIR" ]; then
-  SESSION_ACTIVITY_DIR="-c $ACTIVITY_DIR"
-fi
-
+set -x
 if ! tmux has-session -t "$SESSION_NAME"; then
   # if we don't already have a session start one in the background
-  tmux new-session -d -s "$SESSION_NAME" "$SESSION_ACTIVITY_DIR"
+  tmux new-session -d -s "$SESSION_NAME"
   # and try to tmux-resurrect it
   # FIXME need to read code that stores sessions per session name
   # ~/.tmux/plugins/tmux-resurrect/scripts/restore.sh "$SESSION_NAME"
@@ -33,11 +31,11 @@ fi
 if [ $# -ge 1 ]; then
   # execute command in new window if given a command after session name
   NEW_WINDOW_AND_PANE=$(
-    tmux new-window -P -d -t "$SESSION_NAME" "$SESSION_ACTIVITY_DIR" "$@"
+    tmux new-window -P -d -t "$SESSION_NAME" "$@"
   )
   COMMAND_BIN=$(basename "${1%% *}")
   tmux select-pane -t "${NEW_WINDOW_AND_PANE}" -T "$COMMAND_BIN"
 else
   # or otherwise attach to the session
-  exec tmux attach-session "$SESSION_ACTIVITY_DIR" -t "$SESSION_NAME"
+  exec tmux attach-session -t "$SESSION_NAME"
 fi

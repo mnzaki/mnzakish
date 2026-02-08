@@ -61,17 +61,27 @@ _msh_activity__vars() {
 }
 
 _msh_activity__load_from_tmux() {
-  ACTIVITIES=($(tmux display-message -p "#{session_name}"))
-  if [ ${#ACTIVITIES} -gt 0 ]; then
-    ACTIVITY="${ACTIVITIES[0]}"
-    _msh_activity__vars
-  fi
+  ACTIVITIES=($(tmux display-message -p "#{session_name}" 2>/dev/null))
 }
+
+_msh_activity__load_from_wm() {
+  if ! type _msh_wm_get_current_activity &>/dev/null; then
+    return
+  fi
+  ACTIVITIES=($(_msh_wm_get_current_activity))
+}
+
+if [ -z "$ACTIVITY" ]; then
+  _msh_activity__load_from_tmux ||
+  _msh_activity__load_from_wm
+fi
+
+if [ ${#ACTIVITIES} -gt 0 ]; then
+  ACTIVITY="${ACTIVITIES[0]}"
+  _msh_activity__vars
+fi
 
 if [ -n "$ACTIVITY" ]; then
   _msh_activity__vars
-else # if we don't already have an environment
-  _msh_activity__load_from_tmux
+  mkdir -p "$ACTIVITY_DIR"
 fi
-
-mkdir -p "$ACTIVITY_DIR"
