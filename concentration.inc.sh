@@ -17,6 +17,13 @@
 #      REVISION:  ---
 #===============================================================================
 
+### NEXTUP
+###
+### replace small letters with dots
+### increase frequency of dots
+### replace large letters with bold them
+### increase frequency of bolds
+
 if [ "$0" = "$BASH_SOURCE" ]; then
   echo "You are trying to directly invoke concentration."
   echo "Concentration must be sourced."

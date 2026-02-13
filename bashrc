@@ -10,8 +10,8 @@ source "$MSH_DIR/concentration.inc.sh"
 source "$MSH_DIR/intention.inc.sh"
 source "$MSH_DIR/navigation.inc.sh"
 source "$MSH_DIR/categorization.inc.sh"
-source "$MSH_DIR/space.sh"
-source "$MSH_DIR/time.sh"
+source "$MSH_DIR/space.inc.sh"
+source "$MSH_DIR/time.inc.sh"
 
 
 nodebin () {
