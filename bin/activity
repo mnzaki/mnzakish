@@ -157,7 +157,7 @@ _msh_activity_rofi() {
     rofi -run-command "echo '{cmd}'" -show combi -modes combi -combi-modes "window,run,drun"
   )
   if [ -z "$COMMAND" ]; then return 1; fi
-  _msh_activity_station_run $COMMAND
+  _msh_activity_run $COMMAND
 }
 
 _msh_activity_ls() {

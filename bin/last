@@ -1,0 +1,67 @@
+#!/bin/bash
+
+MY_CALLING="$(basename "$0")"
+
+# This grabs the latest file in a directory and does something with it
+lastfile() {
+  local DIR_VAR_NAME="${1}_DIR"
+  local DIR_OF_FILE="${!DIR_VAR_NAME}"
+  local F=$(realpath "$DIR_OF_FILE/`ls -1t "$DIR_OF_FILE" | head -n 1`")
+  local NEW_FILE=$(basename "$F")
+
+  local FLAG="${MY_CALLING:4+${#1}}"
+
+  printf "%s" "$NEW_FILE" | (
+    xsel -b || xclip -selection clipboard
+  )
+
+  if [ "$FLAG" = "o" ]; then
+    set -x
+    exec xdg-open "$F"
+  fi
+
+  shift
+
+  if [ "$#" -eq 0 ]; then
+    set -x
+    ln -s "$F"
+  else
+    set -x
+    "$@" "$F"
+  fi
+
+  if [ "$FLAG" = "p" ]; then
+    exec xdg-open "$F"
+  fi
+
+  set +x
+}
+
+CAST_DIR=~/Videos/screens
+SCREEN_DIR=~/Images/screenshots
+NOTE_DIR=~/pkb/me/now
+POMO_DIR=~/pkb/pomodoro
+REC_DIR=~/recordings
+
+case "$MY_CALLING" in
+  lastscreen*) lastfile SCREEN "$@" ;;
+  lastcast*) lastfile CAST "$@" ;;
+  lastnote*) lastfile NOTE "$@" ;;
+  lastpomo*) lastfile POMO "$@" ;;
+  lastrec*) lastfile   REC  "$@" ;;
+
+  lastvis)
+    lastfile SCREEN "$@"
+    lastfile CAST   "$@"
+    ;;
+  last)
+    lastfile SCREEN "$@"
+    lastfile CAST   "$@"
+    lastfile NOTE   "$@"
+    ;;
+
+  *)
+    echo "what do you want?"
+    cat $0
+    ;;
+esac

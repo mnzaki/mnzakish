@@ -29,12 +29,13 @@ if ! tmux has-session -t "$SESSION_NAME"; then
 fi
 
 if [ $# -ge 1 ]; then
+  COMMAND_BIN=$(basename "${1%% *}")
+
   # execute command in new window if given a command after session name
   NEW_WINDOW_AND_PANE=$(
-    tmux new-window -P -d -t "$SESSION_NAME" "$@"
+    tmux new-window -P -d -t "$SESSION_NAME" -n "$COMMAND_BIN" "$@"
   )
-  COMMAND_BIN=$(basename "${1%% *}")
-  tmux select-pane -t "${NEW_WINDOW_AND_PANE}" -T "$COMMAND_BIN"
+  tmux select-pane -t "${NEW_WINDOW_AND_PANE}" #-T "$COMMAND_BIN"
 else
   # or otherwise attach to the session
   exec tmux attach-session -t "$SESSION_NAME"

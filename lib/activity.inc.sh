@@ -31,7 +31,8 @@ _msh_activity__set() {
     touch -c "$ACTIVITY_DIR"
   else
     # activity is new, initialize it
-    mkdir -p "$ACTIVITY_DIR/notes"
+    mkdir -p "$ACTIVITY_DIR/notelinks"
+    echo "# ${ACTIVITY}" > "$ACTIVITY_DIR/notelinks/index.md"
     echo "# ${ACTIVITY}" > "$ACTIVITY_DIR/capture.md"
   fi
 
