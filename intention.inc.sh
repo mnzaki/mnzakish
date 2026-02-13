@@ -56,8 +56,11 @@ function readintention {
 
 function setintention {
   local INTENTION="$(readintention "$@")"
-  local NSTACK=$(($(dirs -p | wc -l)))
-  local PRE_INTENTION="${INTENTIONS[$((NSTACK-1))]}"
+  local NSTACK=$(dirs -p | wc -l)
+  local PRE_INTENTION=
+  if [ $NSTACK -gt 1 ]; then
+    PRE_INTENTION="${INTENTIONS[$((NSTACK-1))]}"
+  fi
   INTENTIONS[$((NSTACK-1))]="$PRE_INTENTION\n$INTENTION"
 }
 
@@ -70,20 +73,23 @@ function si {
 }
 
 function getintentions {
-  echo "done:"
-  for (( idx=0; idx<${#INTENTIONS_DONE[@]}; idx++ )); do
-    echo -e "${INTENTIONS_DONE[$idx]}\n"
-  done
-
-  echo -e "\nnow:"
   declare -a STACK
   # STACK is in reverse chrono order
   readarray -t STACK <<<"$(dirs -p)"
   local NSTACK=${#STACK[@]}
   for (( idx=$NSTACK; idx>0; idx-- )); do
-    local ENTRY="${STACK[$idx-1]}\n${INTENTIONS[$(($NSTACK-$idx))]}"
-    echo -e "$ENTRY\n"
+    local ENTRY="${INTENTIONS[$(($NSTACK-$idx))]}\n${STACK[$idx-1]}"
+    if [ $idx -eq $NSTACK ]; then
+      ENTRY="~~ now ~~ $ENTRY"
+    fi
+    echo -e "$ENTRY\n\n"
   done
+
+  echo "~::~ done ~::~"
+  for (( idx=0; idx<${#INTENTIONS_DONE[@]}; idx++ )); do
+    echo -e "${INTENTIONS_DONE[$idx]}\n"
+  done
+
 }
 
 function gist {
