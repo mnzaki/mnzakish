@@ -12,8 +12,3 @@ source "$MSH_DIR/navigation.inc.sh"
 source "$MSH_DIR/categorization.inc.sh"
 source "$MSH_DIR/space.inc.sh"
 source "$MSH_DIR/time.inc.sh"
-
-
-nodebin () {
-  export PATH="$PATH:$(yarn bin)"
-}
