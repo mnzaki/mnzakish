@@ -12,11 +12,14 @@ lastfile() {
   local FLAG="${MY_CALLING:4+${#1}}"
 
   printf "%s" "$NEW_FILE" | (
-    xsel -b || xclip -selection clipboard
+    xsel -b 2>/dev/null || xclip -selection clipboard
   )
 
   if [ "$FLAG" = "o" ]; then
     set -x
+    printf "%s" "$F" | (
+      xsel -b 2>/dev/null || xclip -selection clipboard
+    )
     exec xdg-open "$F"
   fi
 

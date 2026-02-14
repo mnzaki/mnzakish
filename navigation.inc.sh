@@ -17,29 +17,26 @@
 #      REVISION:  ---
 #===============================================================================
 
-#set -o nounset                                  # Treat unset variables as an error
-
 NAVIGATION_LOOKAHEAD_DEPTH=7
 DIR_LIST_CMD="fd -t d -d $NAVIGATION_LOOKAHEAD_DEPTH"
 PATH_LIST_CMD="fd -t f -t l -d $NAVIGATION_LOOKAHEAD_DEPTH"
 
 # fzf completion
-source /usr/share/fzf/completion.bash
-# fzf is a fuzzy finder, with completion for bash on **<TAB>
-_fzf_compgen_path() {
-  echo "$1"
-  command $PATH_LIST_CMD "$1"
-}
-_fzf_compgen_dir() {
-  echo "$1"
-  command $DIR_LIST_CMD "$1"
-}
+if ! type __fzf_defc > /dev/null; then
+  if [ -e /usr/share/fzf/completion.bash ]; then
+    echo sourcing
+    source /usr/share/fzf/completion.bash
+  fi
+fi
 
-# and this adds more of that support for some of my custom commands
-more_fzf_cmds="mpv mpvlowlat menow herenow zathura"
-for cmd in $more_fzf_cmds; do
-  __fzf_defc "$cmd" _fzf_path_completion "-o default -o bashdefault"
-done
+if type __fzf_defc > /dev/null; then
+  # and this adds more of that support for some of my custom commands
+  more_fzf_cmds="mpv mpvlowlat menow herenow zathura"
+  for cmd in $more_fzf_cmds; do
+    __fzf_defc "$cmd" _fzf_path_completion "-o default -o bashdefault"
+    :
+  done
+fi
 
 [ -e "$MSH_CACHE/j_hist" ] || touch "$MSH_CACHE/j_hist"
 # super sayan jump to directory
