@@ -4,9 +4,14 @@ MY_CALLING="$(basename "$0")"
 
 # This grabs the latest file in a directory and does something with it
 lastfile() {
+  local SKIP
+  if [[ "$2" =~ -[[:digit:]] ]]; then
+    SKIP="$2"
+  fi
+
   local DIR_VAR_NAME="${1}_DIR"
   local DIR_OF_FILE="${!DIR_VAR_NAME}"
-  local F=$(realpath "$DIR_OF_FILE/`ls -1t "$DIR_OF_FILE" | head -n 1`")
+  local F=$(realpath "$DIR_OF_FILE/`ls -1t "$DIR_OF_FILE" | head ${SKIP:--1} | tail -1`")
   local NEW_FILE=$(basename "$F")
 
   local FLAG="${MY_CALLING:4+${#1}}"
@@ -23,7 +28,7 @@ lastfile() {
     exec xdg-open "$F"
   fi
 
-  shift
+  shift; if [ -n "$SKIP" ]; then shift; fi
 
   if [ "$#" -eq 0 ]; then
     set -x
